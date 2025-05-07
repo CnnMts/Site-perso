@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "fabric": "^6.6.4",
+    "three": "^0.176.0"
+  }
+}
