@@ -177,7 +177,7 @@ export default {
         const imageData = {
           base64: dataURL,
           transform: imgTransform,
-          width: imgData.width,
+          width: imgData.width ,
           height: imgData.height,
           backgroundColor: this.backgroundColor,
         };

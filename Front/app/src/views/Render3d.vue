@@ -13,7 +13,7 @@
 
 <script>
 import * as THREE from 'three';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import orderModel from '@/models/orderModel';
 import orderItemModel from '@/models/orderItemModel';
@@ -46,40 +46,59 @@ export default {
       this.rotate = !this.rotate;
     },
     initThreeJS() {
-      const scene = new THREE.Scene();
-      const savedData = JSON.parse(localStorage.getItem('customizedImage'));
+  const scene = new THREE.Scene();
+  const savedData = JSON.parse(localStorage.getItem('customizedImage'));
 
-      if (!savedData || !savedData.base64) {
-        console.error("Aucune image personnalisée trouvée dans le localStorage.");
-        return;
-      }
+  if (!savedData || !savedData.base64) {
+    console.error("Aucune image personnalisée trouvée dans le localStorage.");
+    return;
+  }
 
-      scene.background = new THREE.Color(savedData.backgroundColor === '#ffffff' ? 0x000000 : 0xffffff);
+  scene.background = new THREE.Color(savedData.backgroundColor === '#ffffff' ? 0x000000 : 0xffffff);
 
-      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-      camera.position.z = 0.3;
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  camera.position.z = 0.3;
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(500, 500);
-      this.$refs.threeCanvas.appendChild(renderer.domElement);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(500, 500);
+  this.$refs.threeCanvas.appendChild(renderer.domElement);
 
-      this.controls = new OrbitControls(camera, renderer.domElement);
-      this.controls.enableRotate = true;
-      this.controls.enablePan = true;
-      this.controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
-      this.controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+  this.controls = new OrbitControls(camera, renderer.domElement);
+  this.controls.enableRotate = true;
+  this.controls.enablePan = true;
+  this.controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
+  this.controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
 
-      scene.add(new THREE.AmbientLight(0xffffff));
+  scene.add(new THREE.AmbientLight(0xffffff));
+  const loader = new GLTFLoader();
 
-      const loader = new OBJLoader();
-      loader.load(
-        '/Models/11oz-Mug.obj',
-        (object) => {
+loader.load(
+        '/Models/White-Mug.glb',
+        (gltf) => {
+          const object = gltf.scene;
+
           const texture = new THREE.TextureLoader().load(savedData.base64);
+          texture.flipY = false;
+          texture.wrapS = THREE.ClampToEdgeWrapping;
+          texture.wrapT = THREE.ClampToEdgeWrapping;
+          
 
           object.traverse((child) => {
             if (child.isMesh) {
-              child.material = new THREE.MeshBasicMaterial({ map: texture });
+              console.log(child.name)
+              if (child.name === 'Texture') {
+                child.material = new THREE.MeshStandardMaterial({
+                  map: texture,
+                  metalness: 0,
+                  roughness: 1,
+                });
+              } else {
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xffffff,
+                  metalness: 0,
+                  roughness: 1,
+                });
+              }
             }
           });
 
@@ -89,7 +108,7 @@ export default {
         },
         undefined,
         (error) => {
-          console.error('Erreur de chargement OBJ :', error);
+          console.error('Erreur de chargement GLB :', error);
         }
       );
 

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Register from '../components/Register.vue'; // Importer le composant Register
+import Register from '../components/Register.vue'; 
 
 export default {
   components: {
