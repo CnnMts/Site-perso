@@ -1,26 +1,33 @@
 <template>
-  <div>
-    <div>
-      <button @click="saveImage">Confirmer</button>
+  <div class="customizer-wrapper">
+    <div class="left-panel">
+      <h2>Personnalisation</h2>
+      <canvas ref="canvasRef" width="900" height="275" />
+      <input type="file" @change="onFileChange" />
+      <label>
+        Couleur du fond :
+        <input type="color" v-model="backgroundColor" @input="updateBackgroundColor" />
+      </label>
+
     </div>
 
-    <div class="canvas-container" :style="canvasContainerStyle">
-      <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight"></canvas>
-    </div>
-
-    <div class="controls">
-      <input :key="fileInputKey" type="file" @change="onFileChange" />
-      <label for="bgColor">Couleur du fond :</label>
-      <input id="bgColor" type="color" v-model="backgroundColor" @input="updateBackgroundColor" />
+    <div class="right-panel">
+      <DViewModal :image="previewImage" :product="productType" />
+      
     </div>
   </div>
 </template>
 
 <script>
 import * as fabric from "fabric";
+import _ from 'lodash';
+import DViewModal from "@/components/3dViewModal.vue";
 
 export default {
   name: "Customizer",
+  components: {
+    DViewModal
+  },
   data() {
     return {
       canvas: null,
@@ -28,18 +35,13 @@ export default {
       background: null,
       fileInputKey: 0,
       productType: "mug",
-      canvasWidth: 730,
-      canvasHeight: 272,
+      canvasWidth: 900,
+      canvasHeight: 275,
       backgroundColor: "#ffffff",
+      previewImage: null,
+      previewImage: "", 
+
     };
-  },
-  computed: {
-    canvasContainerStyle() {
-      return {
-        width: `${this.canvasWidth}px`,
-        height: `${this.canvasHeight}px`,
-      };
-    }
   },
   async mounted() {
     if (!this.$route.params.id) {
@@ -47,16 +49,24 @@ export default {
       return;
     }
 
-
     await this.$nextTick(() => {
-      this.canvas = new fabric.Canvas(this.$refs.canvas);
+      this.canvas = new fabric.Canvas(this.$refs.canvasRef, {
+      renderOnAddRemove: true,
+      selection: true,
+      preserveObjectStacking: true
+      });
+
       this.updateCanvasSize(this.$route.params.id);
       this.createBackground();
+
+      this.canvas.on("object:moving", () => {
+      this.updatePreviewImage();
+      });
     });
   },
   methods: {
     updateCanvasSize(productId) {
-      if (productId == 1) {  
+      if (productId == 1) {
         this.productType = "mug";
         this.canvasWidth = 900;
         this.canvasHeight = 275;
@@ -78,36 +88,36 @@ export default {
           width: this.canvasWidth,
           height: this.canvasHeight,
         });
-        if (this.canvas && typeof this.canvas.sendToBack === "function") {
-          this.canvas.sendToBack(this.background);
-        }
+        this.canvas.sendToBack(this.background);
       }
     },
 
     createBackground() {
-      this.background = new fabric.Rect({
-        left: 0,
-        top: 0,
-        width: this.canvasWidth,
-        height: this.canvasHeight,
-        fill: this.backgroundColor,
-        selectable: false,
-        evented: false,
-      });
+  const bgRect = new fabric.Rect({
+    left: 0,
+    top: 0,
+    width: this.canvas.getWidth(),
+    height: this.canvas.getHeight(),
+    fill: this.backgroundColor || '#ffffff',
+    selectable: false,
+    evented: false,
+  });
 
-      if (this.canvas) {
-        this.canvas.add(this.background);
-        if (this.canvas && typeof this.canvas.sendToBack === "function") {
-          this.canvas.sendToBack(this.background);
-        }
-        this.canvas.renderAll();
-      }
-    },
+  this.canvas.add(bgRect);
+  requestAnimationFrame(() => {
+    const lastIndex = this.canvas._objects.length - 1;
+    const lastObject = this.canvas._objects[lastIndex];
+    this.canvas._objects.splice(lastIndex, 1); 
+    this.canvas._objects.unshift(lastObject);
+    this.canvas.requestRenderAll();
+  });
+},
 
     updateBackgroundColor() {
       if (this.background) {
         this.background.set("fill", this.backgroundColor);
         this.canvas.renderAll();
+        this.updatePreviewImage();
       }
     },
 
@@ -136,7 +146,7 @@ export default {
       const canvasAspect = this.canvasWidth / this.canvasHeight;
       const imgAspect = imgWidth / imgHeight;
 
-      let scale = imgAspect > canvasAspect
+      const scale = imgAspect > canvasAspect
         ? this.canvasWidth / imgWidth
         : this.canvasHeight / imgHeight;
 
@@ -149,58 +159,43 @@ export default {
 
       this.imgObj = imgInstance;
       this.canvas.add(this.imgObj);
-
-      this.imgObj.setControlsVisibility({
-        tl: true, tr: true, bl: true, br: true,
-      });
-
+      this.imgObj.setControlsVisibility({ tl: true, tr: true, bl: true, br: true });
       this.canvas.setActiveObject(this.imgObj);
       this.canvas.renderAll();
+      this.updatePreviewImage();
     },
 
-    saveImage() {
-      if (this.canvas && this.imgObj) {
-        const dataURL = this.canvas.toDataURL({
-          format: 'png',
-          quality: 1,
-        });
-
-        const imgData = this.imgObj;
-        const imgTransform = {
-          left: imgData.left,
-          top: imgData.top,
-          scaleX: imgData.scaleX,
-          scaleY: imgData.scaleY,
-          angle: imgData.angle,
-        };
-
-        const imageData = {
-          base64: dataURL,
-          transform: imgTransform,
-          width: imgData.width ,
-          height: imgData.height,
-          backgroundColor: this.backgroundColor,
-        };
-
-        localStorage.setItem("customizedImage", JSON.stringify(imageData));
-        console.log("Image + backgroundColor enregistrés.");
+    updatePreviewImage: _.debounce(function () {
+      if (this.canvas) {
+          this.previewImage = this.canvas.toDataURL({ format: 'png', quality: 1 });
       }
-      window.location.href = '/render';
+      }, 100),
+
+
+
+    applyCustomization() {
+      this.updatePreviewImage();
     }
   }
 };
 </script>
 
 <style scoped>
+canvas {
+  transition: all 0.05s linear;
+}
+
+.customizer-wrapper {
+  display: flex;
+  gap: 20px;
+}
+.left-panel, .right-panel {
+  flex: 1;
+}
 .canvas-container {
   margin: 20px;
   border: 1px solid #ccc;
 }
-
-.controls {
-  margin-top: 20px;
-}
-
 button {
   padding: 10px;
   background-color: #4CAF50;
@@ -208,7 +203,6 @@ button {
   border: none;
   cursor: pointer;
 }
-
 button:hover {
   background-color: #45a049;
 }

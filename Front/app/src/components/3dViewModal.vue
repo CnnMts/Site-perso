@@ -1,11 +1,12 @@
 <template>
-  <div class="modal-backdrop" @click.self="close">
-    <div class="modal-content">
-      <div ref="threeCanvas" class="viewer-container"></div>
+  <div class="viewer-wrapper">
+    <div ref="threeCanvas" class="viewer-container"></div>
+
+    <div class="controls">
       <button class="toggle-btn" @click="toggleRotation">
         {{ rotate ? 'Désactiver' : 'Activer' }} la rotation
       </button>
-      <button class="close-btn" @click="close">Fermer</button>
+
       <button class="add-to-cart-btn" @click="addToCart">Ajouter au Panier</button>
     </div>
   </div>
@@ -13,162 +14,255 @@
 
 <script>
 import * as THREE from 'three';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import orderModel from '@/models/orderModel';  
+import orderModel from '@/models/orderModel';
+import orderItemModel from '@/models/orderItemModel';
 
 export default {
-  name: '3DViewerModal',
-  emits: ['close'],
+  name: '3DViewer',
+  props: {
+    image: String,
+    product: String
+  },
   data() {
     return {
+      modelReady: false,
       rotate: true,
       controls: null,
-      productId: 1,  
-      productName: 'Mug personnalisé',  
-      productImage: '', 
+      productId: 1,
+      productName: 'Mug personnalisé',
+      price: 20,
+      quantity: 1,
+      userId: 1,
+      statusId: 1,
+      paymentMethodId: 1,
     };
   },
+ watch: {
+  image(newVal) {
+    if (!this.mug || !this.modelReady) return;
+    
+    if (this.texture) {
+      this.texture.dispose();
+    }
+    this.texture = new THREE.Texture(this.$parent.canvas.lowerCanvasEl);
+    this.texture.needsUpdate = true;
+    this.texture.flipY = false;
+    
+    this.mug.traverse(child => {
+      if (child.isMesh && child.name === 'Texture') {
+        child.material.map = this.texture;
+        child.material.needsUpdate = true;
+      }
+    });
+  }
+},
   mounted() {
+     this.mug = null;
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
     this.initThreeJS();
-  },
+},
   methods: {
-    close() {
-      this.$emit('close');
-    },
     toggleRotation() {
       this.rotate = !this.rotate;
     },
+
     initThreeJS() {
-      const scene = new THREE.Scene();
-      const savedData = JSON.parse(localStorage.getItem('customizedImage'));
+  const container = this.$refs.threeCanvas;
+  container.innerHTML = '';
 
-      if (!savedData || !savedData.base64) {
-        console.error("Aucune image personnalisée trouvée dans le localStorage.");
-        return;
+  this.scene = new THREE.Scene();
+  this.scene.background = new THREE.Color(0xffffff);
+
+  this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  this.camera.position.z = 0.3;
+
+  this.renderer = new THREE.WebGLRenderer({ antialias: true });
+  this.renderer.setSize(500, 500);
+  container.appendChild(this.renderer.domElement);
+
+  this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+  this.controls.enableRotate = true;
+  this.controls.enablePan = true;
+
+  this.scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+  const loader = new GLTFLoader();
+ loader.load(
+  '/Models/White-Mug.glb',
+  (gltf) => {
+    this.mug = gltf.scene;
+    this.mug.position.set(0, -0.03, 0);
+    this.mug.name = 'mug';
+
+    this.scene.add(this.mug);
+    this.modelReady = true;
+
+    this.applyTexture(); 
+  },
+  undefined,
+  (err) => {
+    console.error("Erreur chargement GLB:", err);
+  }
+);
+
+
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+    if (this.rotate && this.mug) {
+      this.mug.rotation.y += 0.004;
+    }
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+  };
+
+  animate();
+},
+    
+    applyTexture() {
+  if (!this.modelReady || !this.mug) return;
+  if (!this.image) {
+    this.mug.traverse((child) => {
+      if (child.isMesh) {
+        child.material = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          metalness: 0,
+          roughness: 1,
+        });
       }
+    });
+    return;
+  }
+  const texture = new THREE.TextureLoader().load(this.image);
+  texture.flipY = false;
 
-      scene.background = new THREE.Color(savedData.backgroundColor === '#ffffff' ? 0x000000 : 0xffffff);
+  this.mug.traverse((child) => {
+    if (child.isMesh) {
+      if (child.name === 'Texture') {
+        child.material = new THREE.MeshStandardMaterial({
+          map: texture,
+          metalness: 0,
+          roughness: 1,
+        });
+      } else {
+        child.material = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          metalness: 0,
+          roughness: 1,
+        });
+      }
+    }
+  });
+},
 
-      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-      camera.position.z = 0.3;
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(500, 500);
-      this.$refs.threeCanvas.appendChild(renderer.domElement);
-
-      this.controls = new OrbitControls(camera, renderer.domElement);
-      this.controls.enableRotate = true;
-      this.controls.enablePan = true;
-      this.controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
-      this.controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
-
-      scene.add(new THREE.AmbientLight(0xffffff));
-
-      const loader = new OBJLoader();
-      loader.load(
-        '/Models/11oz-Mug.obj',
-        (object) => {
-          const texture = new THREE.TextureLoader().load(savedData.base64);
-
-          object.traverse((child) => {
-            if (child.isMesh) {
-              child.material = new THREE.MeshBasicMaterial({ map: texture });
-            }
-          });
-
-          object.position.set(0, -0.03, 0);
-          object.name = 'mug';
-          scene.add(object);
-        },
-        undefined,
-        (error) => {
-          console.error('Erreur de chargement OBJ :', error);
-        }
-      );
-
-      const animate = () => {
-        requestAnimationFrame(animate);
-        const mug = scene.getObjectByName('mug');
-        if (this.rotate && mug) {
-          mug.rotation.y += 0.004;
-        }
-        this.controls.update();
-        renderer.render(scene, camera);
-      };
-
-      animate();
-    },
     async addToCart() {
-      const savedData = JSON.parse(localStorage.getItem('customizedImage'));
-      if (!savedData || !savedData.base64) {
-        console.error("Aucune image personnalisée trouvée dans le localStorage.");
+      if (!this.image) {
+        console.error("Aucune image disponible pour l'ajout au panier.");
         return;
       }
-
-      // Données à envoyer lors de l'ajout au panier
-      const orderData = {
-        productId: this.productId,
-        productName: this.productName,
-        productImage: savedData.base64,  
-        quantity: 1,  
-        price: 20.00,  
-        customerName: 'Matis', 
-        address: '123 rue exemple', 
-      };
 
       try {
-        const response = await orderModel.addOrder(orderData);
-        if (response) {
-          console.log('Commande ajoutée avec succès:', response);
-        }
+        const orderData = {
+          user_id: this.userId,
+          status_id: this.statusId,
+          total_price: this.price,
+          payment_method_id: this.paymentMethodId,
+          picture: this.image,
+        };
+
+        const orderResponse = await orderModel.addOrder(orderData);
+        const orderId = orderResponse.id;
+
+        const orderItemData = {
+          order_id: orderId,
+          product_id: this.productId,
+          name: this.productName,
+        };
+
+        const orderItemResponse = await orderItemModel.addOrderItem(orderItemData);
+        console.log('Commande ajoutée :', { orderResponse, orderItemResponse });
       } catch (error) {
-        console.error('Erreur lors de l\'ajout au panier:', error);
+        console.error("Erreur ajout panier :", error);
       }
     }
   }
 };
+
 </script>
 
 <style scoped>
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+.viewer-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.modal-content {
-  background: white;
   padding: 20px;
-  border-radius: 8px;
-  position: relative;
+  background: #f5f7fa;
+  border-radius: 16px;
+  box-shadow: 0 0px 30px rgba(0, 0, 0, 0.5);
+  max-width: 540px;
+  margin: 0 auto;
 }
+
 .viewer-container {
   width: 500px;
   height: 500px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e0e6f7, #ffffff);
+  box-shadow:
+    inset 0 0 25px rgba(255, 255, 255, 0.8),
+    0 20px 35px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease;
 }
+
+.viewer-container:hover {
+  box-shadow:
+    inset 0 0 35px rgba(255, 255, 255, 0.9),
+    0 30px 60px rgba(0, 0, 0, 0.7);
+}
+
+.controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .toggle-btn,
-.close-btn,
 .add-to-cart-btn {
-  margin-top: 10px;
-  margin-right: 10px;
-  padding: 10px;
-  background-color: #4caf50;
-  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
   border: none;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  border-radius: 5px;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
-.close-btn {
-  background-color: #f44336;
+
+.toggle-btn {
+  background-color: #3a86ff;
+  color: white;
 }
+
+.toggle-btn:hover {
+  background-color: #265ecf;
+  box-shadow: 0 6px 15px rgba(38, 94, 207, 0.5);
+}
+
 .add-to-cart-btn {
-  background-color: #2196f3;
+  background-color: #ffbe0b;
+  color: #333;
 }
+
+.add-to-cart-btn:hover {
+  background-color: #e6a600;
+  box-shadow: 0 6px 15px rgba(230, 166, 0, 0.5);
+}
+
 </style>
