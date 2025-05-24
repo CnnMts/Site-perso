@@ -7,6 +7,7 @@ import LoginView from '../views/LoginPage.vue';
 import ProductDetail from '../views/ProductDetail.vue'; 
 import Customizer from '../views/Customizer.vue';
 import Render3d from '../views/Render3d.vue';
+import Contact from '../views/Contact.vue';
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     path: '/render',
     name: 'render',
     component:  Render3d
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component:  Contact
   }
 ];
 

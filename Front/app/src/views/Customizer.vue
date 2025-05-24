@@ -4,11 +4,6 @@
       <h2>Personnalisation</h2>
       <canvas ref="canvasRef" width="900" height="275" />
       <input type="file" @change="onFileChange" />
-      <label>
-        Couleur du fond :
-        <input type="color" v-model="backgroundColor" @input="updateBackgroundColor" />
-      </label>
-
     </div>
 
     <div class="right-panel">

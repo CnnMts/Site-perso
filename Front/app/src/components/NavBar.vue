@@ -5,7 +5,9 @@
 <template>
   <div class="container-nav">
     <div class="Logo">
-      <img id="logo" src="../assets/navIcon/Logo.webp">
+      <a href="/">
+        <img id="logo" src="../assets/navIcon/Logo.webp">
+      </a>
     </div>
     <div class="nav-left">
       <div class="search-container">
@@ -13,7 +15,9 @@
         <button class="search-button">🔍</button>
       </div>
       <div class="nav-icon">
-        <img src="../assets/navIcon/support.png">
+          <a href="/contact">
+            <img src="../assets/navIcon/support.png">
+          </a>
       </div>
       <div class="nav-icon">
         <img src="../assets/navIcon/hearth.png">
@@ -82,6 +86,7 @@
 }
 
 .nav-icon img {
+  height: 50px;
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
@@ -96,6 +101,7 @@
 }
 
 #logo{
+   height: 80px;
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
