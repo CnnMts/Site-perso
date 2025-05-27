@@ -16,6 +16,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import userModel from '@/models/userModel';
 import orderModel from '@/models/orderModel';
 import orderItemModel from '@/models/orderItemModel';
 
@@ -34,138 +35,164 @@ export default {
       productName: 'Mug personnalisé',
       price: 20,
       quantity: 1,
-      userId: 1,
+      userId: null,
       statusId: 1,
       paymentMethodId: 1,
     };
   },
- watch: {
-  image(newVal) {
-    if (!this.mug || !this.modelReady) return;
-    
-    if (this.texture) {
-      this.texture.dispose();
-    }
-    this.texture = new THREE.Texture(this.$parent.canvas.lowerCanvasEl);
-    this.texture.needsUpdate = true;
-    this.texture.flipY = false;
-    
-    this.mug.traverse(child => {
-      if (child.isMesh && child.name === 'Texture') {
-        child.material.map = this.texture;
-        child.material.needsUpdate = true;
+  watch: {
+    image(newVal) {
+      if (!this.mug || !this.modelReady) return;
+
+      if (this.texture) {
+        this.texture.dispose();
       }
-    });
-  }
-},
+      this.texture = new THREE.Texture(this.$parent.canvas.lowerCanvasEl);
+      this.texture.needsUpdate = true;
+      this.texture.flipY = false;
+
+      this.mug.traverse(child => {
+        if (child.isMesh && child.name === 'Texture') {
+          child.material.map = this.texture;
+          child.material.needsUpdate = true;
+        }
+      });
+    }
+  },
+  created() {
+    const username = this.getCookie('id');
+    console.log(username);
+
+    if (username) {
+      userModel.getUserByName(username)
+        .then((data) => {
+          this.userId = data.id;
+          console.log('User ID récupéré depuis l’API :', this.userId);
+        })
+        .catch(() => {
+          console.error("Impossible de récupérer l'utilisateur avec ce nom.");
+        });
+    } else {
+      console.error('Aucun nom trouvé dans le cookie.');
+    }
+  },
   mounted() {
-     this.mug = null;
-    this.scene = null;
-    this.camera = null;
-    this.renderer = null;
-    this.initThreeJS();
+  this.mug = null;
+  this.scene = null;
+  this.camera = null;
+  this.renderer = null;
+  this.initThreeJS();
+
 },
   methods: {
     toggleRotation() {
       this.rotate = !this.rotate;
     },
 
+    getCookie(name) {
+      console.log(document.cookie);
+      const cookieArr = document.cookie.split(';');
+      for (let i = 0; i < cookieArr.length; i++) {
+        const cookiePair = cookieArr[i].split('=');
+        if (name === cookiePair[0].trim()) {
+          return decodeURIComponent(cookiePair[1]);
+        }
+      }
+      return null;
+    },
+
     initThreeJS() {
-  const container = this.$refs.threeCanvas;
-  container.innerHTML = '';
+      const container = this.$refs.threeCanvas;
+      container.innerHTML = '';
 
-  this.scene = new THREE.Scene();
-  this.scene.background = new THREE.Color(0xffffff);
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0xffffff);
 
-  this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-  this.camera.position.z = 0.3;
+      this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+      this.camera.position.z = 0.3;
 
-  this.renderer = new THREE.WebGLRenderer({ antialias: true });
-  this.renderer.setSize(500, 500);
-  container.appendChild(this.renderer.domElement);
+      this.renderer = new THREE.WebGLRenderer({ antialias: true });
+      this.renderer.setSize(500, 500);
+      container.appendChild(this.renderer.domElement);
 
-  this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-  this.controls.enableRotate = true;
-  this.controls.enablePan = true;
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.enableRotate = true;
+      this.controls.enablePan = true;
 
-  this.scene.add(new THREE.AmbientLight(0xffffff, 1));
+      this.scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-  const loader = new GLTFLoader();
- loader.load(
-  '/Models/White-Mug.glb',
-  (gltf) => {
-    this.mug = gltf.scene;
-    this.mug.position.set(0, -0.03, 0);
-    this.mug.name = 'mug';
+      const loader = new GLTFLoader();
+      loader.load(
+        '/Models/White-Mug.glb',
+        (gltf) => {
+          this.mug = gltf.scene;
+          this.mug.position.set(0, -0.03, 0);
+          this.mug.name = 'mug';
 
-    this.scene.add(this.mug);
-    this.modelReady = true;
+          this.scene.add(this.mug);
+          this.modelReady = true;
 
-    this.applyTexture(); 
-  },
-  undefined,
-  (err) => {
-    console.error("Erreur chargement GLB:", err);
-  }
-);
+          this.applyTexture();
+        },
+        undefined,
+        (err) => {
+          console.error("Erreur chargement GLB:", err);
+        }
+      );
 
+      const animate = () => {
+        requestAnimationFrame(animate);
+        if (this.rotate && this.mug) {
+          this.mug.rotation.y += 0.004;
+        }
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+      };
 
+      animate();
+    },
 
-  const animate = () => {
-    requestAnimationFrame(animate);
-    if (this.rotate && this.mug) {
-      this.mug.rotation.y += 0.004;
-    }
-    this.controls.update();
-    this.renderer.render(this.scene, this.camera);
-  };
-
-  animate();
-},
-    
     applyTexture() {
-  if (!this.modelReady || !this.mug) return;
-  if (!this.image) {
-    this.mug.traverse((child) => {
-      if (child.isMesh) {
-        child.material = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-          metalness: 0,
-          roughness: 1,
+      if (!this.modelReady || !this.mug) return;
+      if (!this.image) {
+        this.mug.traverse((child) => {
+          if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+              metalness: 0,
+              roughness: 1,
+            });
+          }
         });
+        return;
       }
-    });
-    return;
-  }
-  const texture = new THREE.TextureLoader().load(this.image);
-  texture.flipY = false;
+      const texture = new THREE.TextureLoader().load(this.image);
+      texture.flipY = false;
 
-  this.mug.traverse((child) => {
-    if (child.isMesh) {
-      if (child.name === 'Texture') {
-        child.material = new THREE.MeshStandardMaterial({
-          map: texture,
-          metalness: 0,
-          roughness: 1,
-        });
-      } else {
-        child.material = new THREE.MeshStandardMaterial({
-          color: 0xffffff,
-          metalness: 0,
-          roughness: 1,
-        });
-      }
-    }
-  });
-},
-
+      this.mug.traverse((child) => {
+        if (child.isMesh) {
+          if (child.name === 'Texture') {
+            child.material = new THREE.MeshStandardMaterial({
+              map: texture,
+              metalness: 0,
+              roughness: 1,
+            });
+          } else {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+              metalness: 0,
+              roughness: 1,
+            });
+          }
+        }
+      });
+    },
 
     async addToCart() {
       if (!this.image) {
         console.error("Aucune image disponible pour l'ajout au panier.");
         return;
       }
-
       try {
         const orderData = {
           user_id: this.userId,
@@ -192,7 +219,6 @@ export default {
     }
   }
 };
-
 </script>
 
 <style scoped>

@@ -2,7 +2,6 @@
   <div class="login-form">
     <h1>Connexion</h1>
     <form @submit.prevent="handleSubmit">
-     
       <div>
         <label for="email">Email</label>
         <input type="email" id="email" v-model="email" required />
@@ -11,10 +10,9 @@
         <label for="password">Mot de passe</label>
         <input type="password" id="password" v-model="password" required />
       </div>
-  
+
       <button type="submit">Connecter</button>
 
-      
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
@@ -23,8 +21,6 @@
 </template>
 
 <script>
-import userModel from '@/models/userModel'; 
-
 export default {
   name: 'register',
 
@@ -43,6 +39,7 @@ export default {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(userData),
         });
 
@@ -60,39 +57,26 @@ export default {
     },
 
     async handleSubmit() {
-  const userData = {
-    email: this.email,
-    password: this.password,
-  };
-  const createdUser = await this.createUser(userData);
+      const userData = {
+        email: this.email,
+        password: this.password,
+      };
+      const createdUser = await this.createUser(userData);
 
-  if (createdUser) {
-    try {
-      const user = await userModel.getNameByEmail(this.email);
-      if (user ) {
-        localStorage.setItem('name', user);
-        alert(`Bienvenue ${user} ! Connexion réussie !`);
-        window.location.href = '/';
+      if (createdUser) {
+
+        alert(`Bienvenue ! Connexion réussie !`);
+        this.email = '';
+        this.password = '';
+        this.errorMessage = '';
+         this.$router.push('/');
       } else {
-        console.error("Nom introuvable pour l'utilisateur.");
+        this.errorMessage = "Une erreur est survenue lors de la connexion.";
       }
-    } catch (error) {
-      console.error("Erreur lors de la récupération du nom :", error.message);
-    }
-
-    this.email = '';
-    this.password = '';
-    this.errorMessage = '';
-  } else {
-    this.errorMessage = "Une erreur est survenue lors de la connexion.";
-  }
-},
-
+    },
   },
 };
 </script>
-
-
 
 
 <style scoped>

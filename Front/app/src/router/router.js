@@ -1,4 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { jwtDecode } from 'jwt-decode';
+
+
 import Home from '../views/Home.vue';
 import TodoApp from '../views/TodoApp.vue'; 
 import UserView from '../views/ViewModelUser.vue'; 
@@ -8,13 +11,11 @@ import ProductDetail from '../views/ProductDetail.vue';
 import Customizer from '../views/Customizer.vue';
 import Render3d from '../views/Render3d.vue';
 import Contact from '../views/Contact.vue';
+import Dash from '../views/DashBoard.vue';
+
+const admin = 1;
 
 const routes = [
-  {
-    path: '/app',
-    name: 'TodoApp',
-    component: TodoApp,
-  },
   {
     path: '/',
     name: 'Home',
@@ -48,18 +49,50 @@ const routes = [
   {
     path: '/render',
     name: 'render',
-    component:  Render3d
+    component: Render3d
   },
   {
     path: '/contact',
     name: 'contact',
-    component:  Contact
+    component: Contact
+  },
+  {
+    path: '/dash',
+    name: 'dash',
+    component: Dash
   }
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+
+  if (to.path === '/dash') {
+    if (!token) {
+      alert("Accès refusé. Veuillez vous connecter.");
+      return next('/login');
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.role === admin) {
+        return next(); 
+      } else {
+        alert("Accès réservé aux administrateurs.");
+        return next('/');
+      }
+    } catch (err) {
+      console.error("Token invalide :", err);
+      localStorage.removeItem('token');
+      return next('/login');
+    }
+  }
+
+  return next(); 
 });
 
 export default router;
