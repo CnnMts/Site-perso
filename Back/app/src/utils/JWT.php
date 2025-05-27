@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Utils;
+
+
 use \Exception;
 
 class JWT {
@@ -16,7 +18,9 @@ class JWT {
     }
 
   public static function generate($payload) {
-    self::$secret = getenv('JWT_SECRET') ?: null;
+    if (empty(self::$secret)) {
+        throw new Exception("JWT secret not initialized.");
+    }
     // Base 64
       // Header
     $header = self::base64UrlEncode(json_encode([

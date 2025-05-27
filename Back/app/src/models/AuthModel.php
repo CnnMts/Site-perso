@@ -8,6 +8,8 @@ use App\Middlewares\Roles;
 use \PDO;
 use \Exception;
 
+
+
 class AuthModel extends SqlConnect {
   private string $table  = "user";
   private int $tokenValidity = 3600*24;
@@ -94,7 +96,11 @@ class AuthModel extends SqlConnect {
     if ($user) {
         if (password_verify($password, $user['password'])) {
             $token = $this->generateJWT($user['id'], $user['role_id']);
-            return ['token' => $token];
+            return [
+                    'token' => $token,
+                    'id' => $user['id'],
+                    ];
+
         }
         throw new HttpException("Mauvais mot de passe", 401);
     }
@@ -106,11 +112,15 @@ class AuthModel extends SqlConnect {
   /*========================= JWT  ==========================================*/
 
   private function generateJWT(int $userId, int $role) {
+    JWT::initialize();
+
     $payload = [
-      'id' => $userId,
-      'role' => $role,
-      'exp' => time() + $this->tokenValidity
+        'id' => $userId,
+        'role' => $role,
+        'exp' => time() + $this->tokenValidity
     ];
+
     return JWT::generate($payload);
-  }
+}
+
 }

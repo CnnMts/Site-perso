@@ -38,6 +38,23 @@ class User extends Controller {
     return $this->user->get(intval($this->params['id']));
   }
 
+
+   /*========================= GET BY Name=====================================*/
+
+  #[Route("GET", "/caca/:name")]
+  public function getUserByName() {
+    $name = $this->params['name'];
+    $user = $this->user->findByName($name);
+
+    if ($user) {
+        return $user;
+    } else {
+        http_response_code(404);
+        return ['error' => 'Utilisateur non trouvé'];
+    }
+}
+
+
   /*========================= GET BY EMAIL =====================================*/
 
   #[Route("GET", "user/search/:email")]

@@ -48,6 +48,17 @@ class UserModel extends SqlConnect {
       $req->fetch(PDO::FETCH_ASSOC) : new stdClass();
   }
 
+    /*========================= GET BY NAME =====================================*/
+
+public function findByName(string $name): ?array {
+    $stmt = $this->db->prepare("SELECT * FROM $this->table WHERE name = :name");
+    $stmt->bindParam(':name', $name);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+}
+
+
+
 
   /*========================= GET BY EMAIL =====================================*/
 

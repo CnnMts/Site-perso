@@ -4,6 +4,12 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require 'vendor/autoload.php';
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+putenv("JWT_SECRET=" . $_ENV['JWT_SECRET']); 
+
 
 $allowedOrigins = [
     'http://localhost:5173',
@@ -17,7 +23,6 @@ if (in_array($origin, $allowedOrigins)) {
     header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
 }
-
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(204); 
@@ -34,8 +39,10 @@ use App\Controllers\{
     PaymentMethod,
     Product,
     Role,
-    User
+    User,
+    ContactMessage
 };
+
 $controllers = [
     Auth::class,
     Category::class,
@@ -46,6 +53,7 @@ $controllers = [
     Product::class,
     Role::class,
     User::class,
+    ContactMessage::class,
 ];
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

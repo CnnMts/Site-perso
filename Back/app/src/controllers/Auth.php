@@ -33,21 +33,37 @@ class Auth extends Controller {
  /*========================= LOGIN ==========================================*/
 
   #[Route("POST", "/auth/login")]
-  public function login() {
+public function login() {
     try {
         $data = $this->body;
 
         if (empty($data['email']) || empty($data['password'])) {
             throw new HttpException("Email ou mot de passe manquant.", 400);
         }
+        $user = $this->auth->login($data['email'], $data['password']);
 
-        $token = $this->auth->login($data['email'], $data['password']);
-        return $token;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $_SESSION['user'] = $user;
+        
+        
+        $options = [
+            'expires'  => time() + 10000,
+            'path'     => '/',
+            'secure'   => false,   
+            'httponly' => false,
+            'samesite' => 'Lax'
+        ];
 
+        setcookie("id", $user['id'], $options);
+        setcookie("token", $user['token'], $options);
+
+        
+        return $user;
     } catch (\Exception $e) {
         throw new HttpException($e->getMessage(), 401);
     }
 }
-
-
 }
