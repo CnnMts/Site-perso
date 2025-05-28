@@ -20,6 +20,10 @@ import userModel from '@/models/userModel';
 import orderModel from '@/models/orderModel';
 import orderItemModel from '@/models/orderItemModel';
 
+
+import { jwtDecode } from 'jwt-decode';
+
+
 export default {
   name: '3DViewer',
   props: {
@@ -60,22 +64,18 @@ export default {
     }
   },
   created() {
-    const username = this.getCookie('id');
-    console.log(username);
-
-    if (username) {
-      userModel.getUserByName(username)
-        .then((data) => {
-          this.userId = data.id;
-          console.log('User ID récupéré depuis l’API :', this.userId);
-        })
-        .catch(() => {
-          console.error("Impossible de récupérer l'utilisateur avec ce nom.");
-        });
-    } else {
-      console.error('Aucun nom trouvé dans le cookie.');
+  const token = this.getCookie('pmaUser');
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      this.userId = decoded.id;
+    } catch (err) {
+      console.error("Erreur lors du décodage du token :", err);
     }
-  },
+  } else {
+    console.error("Aucun token trouvé dans les cookies.");
+  }
+},
   mounted() {
   this.mug = null;
   this.scene = null;
@@ -90,7 +90,6 @@ export default {
     },
 
     getCookie(name) {
-      console.log(document.cookie);
       const cookieArr = document.cookie.split(';');
       for (let i = 0; i < cookieArr.length; i++) {
         const cookiePair = cookieArr[i].split('=');
@@ -106,7 +105,7 @@ export default {
       container.innerHTML = '';
 
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0xffffff);
+      this.scene.background = new THREE.Color(0x000000);
 
       this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
       this.camera.position.z = 0.3;
@@ -213,6 +212,8 @@ export default {
 
         const orderItemResponse = await orderItemModel.addOrderItem(orderItemData);
         console.log('Commande ajoutée :', { orderResponse, orderItemResponse });
+        alert('Commande Effectuer');
+         this.$router.push('/');
       } catch (error) {
         console.error("Erreur ajout panier :", error);
       }
@@ -272,23 +273,23 @@ export default {
 }
 
 .toggle-btn {
-  background-color: #3a86ff;
+  background-color: #216fa3;
   color: white;
 }
 
 .toggle-btn:hover {
-  background-color: #265ecf;
+  background-color: #2b5ab8;
   box-shadow: 0 6px 15px rgba(38, 94, 207, 0.5);
 }
 
 .add-to-cart-btn {
-  background-color: #ffbe0b;
-  color: #333;
+  background-color: #881579;
+  color: #fdfdfd;
 }
 
 .add-to-cart-btn:hover {
-  background-color: #e6a600;
-  box-shadow: 0 6px 15px rgba(230, 166, 0, 0.5);
+  background-color: #611164;
+  box-shadow: 0 6px 15px rgba(65, 2, 73, 0.562);
 }
 
 </style>

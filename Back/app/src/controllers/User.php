@@ -32,8 +32,8 @@ class User extends Controller {
   /*========================= GET BY ID =====================================*/
 
   #[Route("GET", "/user/:id",
-    middlewares: [AuthMiddleware::class, 
-    [RoleMiddleware::class, Roles::ROLE_ADMIN]])]
+   /* middlewares: [AuthMiddleware::class, 
+    [RoleMiddleware::class, Roles::ROLE_ADMIN]]*/)]
   public function getUser() {
     return $this->user->get(intval($this->params['id']));
   }
@@ -109,8 +109,8 @@ class User extends Controller {
   /*========================= DELETE ========================================*/
 
   #[Route("DELETE", "/user/:id",
-    middlewares: [AuthMiddleware::class, 
-    [RoleMiddleware::class, Roles::ROLE_ADMIN]])]
+    /*middlewares: [AuthMiddleware::class, 
+    [RoleMiddleware::class, Roles::ROLE_ADMIN]]*/)]
   public function deleteUser() {
     return $this->user->delete(intval($this->params['id']));
   }

@@ -57,8 +57,7 @@ public function login() {
             'samesite' => 'Lax'
         ];
 
-        setcookie("id", $user['id'], $options);
-        setcookie("token", $user['token'], $options);
+        setcookie("pmaUser", $user['token'], $options);
 
         
         return $user;

@@ -24,7 +24,7 @@
 
         <div class="info-section">
           <p><strong>Commande #{{ order.id }}</strong></p>
-          <p>Client : {{ order.user_id }}</p>
+          <p>Client : {{ order.user_name  }} {{ order.user_firstname }}</p>
           <p>Date : {{ formatDate(order.updated_at) }}</p>
           <p>Total : {{ order.total_price }} €</p>
         </div>
@@ -35,6 +35,7 @@
 
 <script>
 import orderModel from '@/models/orderModel';
+import userModel from '@/models/userModel';
 
 export default {
   data() {
@@ -43,17 +44,39 @@ export default {
     };
   },
   async mounted() {
-    try {
-      const response = await orderModel.getOrders();
-      this.orders = response || [];
-      console.log(response);
-    } catch (error) {
-      console.error("Erreur lors du chargement des commandes :", error);
-    }
-  },
+  try {
+    const response = await orderModel.getOrders();
+    const ordersWithUsernames = await Promise.all(
+      response.map(async (order) => {
+        try {
+          const user = await userModel.getUserById(order.user_id);
+          return {
+            ...order,
+            user_name: user?.name || "Inconnu",
+             user_firstname: user?.firstname || "Inconnu",
+          };
+        } catch {
+          return {
+            ...order,
+            user_name: "Inconnu",
+          };
+        }
+      })
+    );
+
+    this.orders = ordersWithUsernames;
+  } catch (error) {
+    console.error("Erreur lors du chargement des commandes :", error);
+  }
+},
   methods: {
     formatDate(dateString) {
       return new Date(dateString).toLocaleString("fr-FR");
+    },
+
+    async getNameUserById(id){
+      const response = await userModel.getUserById('id');
+      const userId = response || null ;
     }
   }
 };

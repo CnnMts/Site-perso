@@ -31,8 +31,8 @@ class Role extends Controller {
   /*========================= GET BY ID =====================================*/
 
   #[Route("GET", "/role/:id",
-    middlewares: [AuthMiddleware::class, 
-    [RoleMiddleware::class, Roles::ROLE_ADMIN]])]
+    /*middlewares: [AuthMiddleware::class, 
+    [RoleMiddleware::class, Roles::ROLE_ADMIN]]*/)]
   public function getRole() {
     return $this->role->get(intval($this->params['id']));
   }

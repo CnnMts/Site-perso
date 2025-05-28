@@ -28,7 +28,8 @@ export default {
 <style scoped>
 .product-card {
   cursor: pointer;
-  border: 1px solid #ddd;
+  background-color: aliceblue;
+  border: 1px solid #4d4747;
   border-radius: 8px;
   width: 245px;
   padding: 15px;
@@ -45,6 +46,7 @@ export default {
 
 .product-info {
   margin-top: 10px;
+  
 }
 
 .product-name {

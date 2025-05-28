@@ -98,7 +98,6 @@ class AuthModel extends SqlConnect {
             $token = $this->generateJWT($user['id'], $user['role_id']);
             return [
                     'token' => $token,
-                    'id' => $user['id'],
                     ];
 
         }

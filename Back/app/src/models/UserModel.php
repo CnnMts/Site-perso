@@ -142,17 +142,24 @@ public function findByName(string $name): ?array {
   
   /*========================= DELETE ========================================*/
 
-  public function delete(int $id) {
-    $query = "SELECT * FROM $this->table WHERE id = :id";
-    $req = $this->db->prepare($query);
-    $req->execute(["id" => $id]);
-    
-    if ($req->rowCount() == 0) {
-      throw new HttpException("User doesn't exists !", 400);
-    }
+ public function delete(int $id) {
+    try {
+        $query = "SELECT * FROM $this->table WHERE id = :id";
+        $req = $this->db->prepare($query);
+        $req->execute(["id" => $id]);
 
-    $req = $this->db->prepare("DELETE FROM $this->table WHERE id = :id");
-    $req->execute(["id" => $id]);
-    return new stdClass();
-  }
+        if ($req->rowCount() == 0) {
+            throw new HttpException("User doesn't exist!", 400);
+        }
+
+        $req = $this->db->prepare("DELETE FROM $this->table WHERE id = :id");
+        $req->execute(["id" => $id]);
+
+        return json_encode(["success" => true]);
+    } catch (PDOException $e) {
+        throw new HttpException("Erreur lors de la suppression : " . $e->getMessage(), 500);
+    }
+}
+
+
 }

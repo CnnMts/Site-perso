@@ -178,6 +178,7 @@ export default {
 <style scoped>
 canvas {
   transition: all 0.05s linear;
+   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
 }
 
 .customizer-wrapper {
@@ -186,6 +187,13 @@ canvas {
 }
 .left-panel, .right-panel {
   flex: 1;
+  
+}
+.right-panel{
+  display: flex;
+  height: 98vh;
+  justify-content: center;
+  align-items: center;
 }
 .canvas-container {
   margin: 20px;

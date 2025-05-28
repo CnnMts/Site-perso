@@ -2,10 +2,9 @@
   <div class="container-left">
     <div class="logo">Admin</div>
     <nav class="nav-links">
-      <a href="#" class="nav-item">Dashboard</a>
-      <a href="#" class="nav-item">Utilisateurs</a>
+      <a href="/dash" class="nav-item">Dashboard</a>
+      <a href="/dash/users" class="nav-item">Utilisateurs</a>
       <a href="#" class="nav-item">Produits</a>
-      <a href="#" class="nav-item">Commandes</a>
       <a href="#" class="nav-item">Déconnexion</a>
     </nav>
   </div>
