@@ -82,6 +82,50 @@ class OrderModel extends SqlConnect {
     return $req->fetchAll(PDO::FETCH_ASSOC);
   }
 
+
+
+  /*======================== GET WITH ITEMS =================================*/
+  public function getAllOrdersWithItems() {
+      $query = "SELECT 
+                o.*, 
+                oi.product_id, 
+                p.name AS product_name
+              FROM orders o
+              LEFT JOIN order_items oi ON o.id = oi.order_id
+              LEFT JOIN product p ON oi.product_id = p.id
+              ORDER BY o.updated_at DESC";
+
+      $req = $this->db->prepare($query);
+      $req->execute();
+      $results = $req->fetchAll(PDO::FETCH_ASSOC);
+      $orders = [];
+      foreach ($results as $row) {
+        $orderId = $row['id'];
+
+          if (!isset($orders[$orderId])) {
+              $orders[$orderId] = [
+                  'id' => $row['id'],
+                  'user_id' => $row['user_id'],
+                  'total_price' => $row['total_price'],
+                  'updated_at' => $row['updated_at'],
+                  'picture' => $row['picture'],
+                  'items' => []
+              ];
+          }
+          if ($row['product_id']) {
+              $orders[$orderId]['items'][] = [
+                  'product_id' => $row['product_id'],
+                  'name' => $row['product_name'],
+              ];
+          }
+      }
+    return array_values($orders);
+  }
+
+
+
+
+
   /*========================= GET LAST ======================================*/
 
   public function getLast() {

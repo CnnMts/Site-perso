@@ -1,9 +1,17 @@
 <template>
-  <div v-if="product.display === 1" class="product-card" @click="goToProductDetail">
-    <img :src="product.picture_url || '/Assets/Accessoire/default.jpg'" alt="Image produit" class="product-image" />
-    <div class="product-info">
-      <h3 class="product-name">{{ product.name }}</h3>
-      <p class="product-price">{{ product.sale_price }} €</p>
+  <div
+    v-if="product.display === 1"
+    class="cursor-pointer bg-blue-50 border border-gray-700 rounded-lg w-[245px] p-4 shadow-md text-center hover:shadow-lg transition"
+    @click="goToProductDetail"
+  >
+    <img
+      :src="product.picture_url || '/Assets/Accessoire/default.jpg'"
+      alt="Image produit"
+      class="w-full h-[250px] object-cover rounded-lg"
+    />
+    <div class="mt-3">
+      <h3 class="text-lg font-bold my-2">{{ product.name }}</h3>
+      <p class="text-orange-600 text-base">{{ product.sale_price }} €</p>
     </div>
   </div>
 </template>
@@ -26,37 +34,5 @@ export default {
 </script>
 
 <style scoped>
-.product-card {
-  cursor: pointer;
-  background-color: aliceblue;
-  border: 1px solid #4d4747;
-  border-radius: 8px;
-  width: 245px;
-  padding: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.product-image {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.product-info {
-  margin-top: 10px;
-  
-}
-
-.product-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.product-price {
-  font-size: 16px;
-  color: #ff5722;
-}
+/* Plus besoin de style ici, tout est en Tailwind */
 </style>

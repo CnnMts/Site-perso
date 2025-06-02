@@ -4,15 +4,33 @@
     <nav class="nav-links">
       <a href="/dash" class="nav-item">Dashboard</a>
       <a href="/dash/users" class="nav-item">Utilisateurs</a>
-      <a href="#" class="nav-item">Produits</a>
-      <a href="#" class="nav-item">Déconnexion</a>
+      <a href="/dash/product" class="nav-item">Produits</a>
+     <a href="#" class="nav-item" @click.prevent="logout">Déconnexion</a>
+
+
     </nav>
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  methods: {
+    async logout() {
+      try {
+        fetch("http://127.0.0.1:9999/auth/logout", {
+          method: "POST",
+          credentials: "include"
+        });
+        alert("Vous êtes déconnecté");
+        window.location.href = "/login";
+      } catch (error) {
+        console.error("Erreur de déconnexion :", error);
+      }
+    }
+  }
+}
 </script>
+
 
 <style scoped>
 .container-left {

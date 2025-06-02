@@ -1,16 +1,11 @@
 <template>
-    <div class="footer-container">
-      <footer>
-        <p>Numéro</p>
-      </footer>
-    </div>
+  <div class="bg-gray-800 text-white py-6">
+    <footer class="text-center">
+      <p class="text-sm sm:text-base">Numéro</p>
+    </footer>
+  </div>
 </template>
 
 <script>
-
+export default {};
 </script>
-
-
-<style>
-
-</style>

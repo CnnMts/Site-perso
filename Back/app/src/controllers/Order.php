@@ -45,6 +45,18 @@ class Order extends Controller {
       return $this->order->getAll($limit);
   }
 
+  /*========================== GET WITH ITEMS ===============================*/
+
+  
+  #[Route("GET", "/ordersItems",
+    /*middlewares: [AuthMiddleware::class]*/)]
+
+  public function getAllOrders() {
+    $orders = $this->order->getAllOrdersWithItems();
+    return $orders;
+}
+
+
   /*========================= PATCH =========================================*/
 
   #[Route("PATCH", "/orders/:id", 

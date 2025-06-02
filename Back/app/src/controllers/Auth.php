@@ -32,37 +32,52 @@ class Auth extends Controller {
 
  /*========================= LOGIN ==========================================*/
 
-  #[Route("POST", "/auth/login")]
-public function login() {
-    try {
-        $data = $this->body;
-
-        if (empty($data['email']) || empty($data['password'])) {
-            throw new HttpException("Email ou mot de passe manquant.", 400);
-        }
-        $user = $this->auth->login($data['email'], $data['password']);
-
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
-        $_SESSION['user'] = $user;
-        
-        
-        $options = [
-            'expires'  => time() + 10000,
-            'path'     => '/',
-            'secure'   => false,   
-            'httponly' => false,
-            'samesite' => 'Lax'
-        ];
-
-        setcookie("pmaUser", $user['token'], $options);
-
-        
+    #[Route("POST", "/auth/login")]
+    public function login() {
+        try {
+            $data = $this->body;
+            if (empty($data['email']) || empty($data['password'])) {
+                throw new HttpException("Email ou mot de passe manquant.", 400);
+            }
+            $user = $this->auth->login($data['email'], $data['password']);
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION['user'] = $user;
+            $options = [
+                'expires'  => time() + 10000,
+                'path'     => '/',
+                'secure'   => false,   
+                'httponly' => false,
+                'samesite' => 'Lax'
+            ];
+            setcookie("pmaUser", $user['token'], $options);
         return $user;
-    } catch (\Exception $e) {
-        throw new HttpException($e->getMessage(), 401);
+        } catch (\Exception $e) {
+            throw new HttpException($e->getMessage(), 401);
+        }
     }
+
+ /*========================= LOGOUT =========================================*/
+
+    #[Route("POST", "/auth/logout")]
+    public function logout() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    session_unset();
+    session_destroy();
+    setcookie("pmaUser", "", [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'secure'   => false,
+        'httponly' => false,
+        'samesite' => 'Lax'
+    ]);
+
+    return ['message' => 'Déconnexion réussie'];
 }
+
+
 }

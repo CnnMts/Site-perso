@@ -108,6 +108,19 @@ class AuthModel extends SqlConnect {
 }
 
 
+
+/*============================LOGOUT=========================================*/
+    public function logout(): array {
+        if (isset($_COOKIE['jwt'])) {
+            setcookie('jwt', '', time() - 3600, '/', '', false, true); 
+            unset($_COOKIE['jwt']);
+        }
+
+        return ["message" => "Déconnexion réussie"];
+}
+
+
+
   /*========================= JWT  ==========================================*/
 
   private function generateJWT(int $userId, int $role) {

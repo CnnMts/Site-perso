@@ -8,8 +8,8 @@ use stdClass;
 class ProductModel extends SqlConnect {
   private $table = "product";
   public $authorized_fields_to_update = [
-    'name', 'category_id', 'sale_price', 'purchase_price', 
-   'stock','stock_alert', 'sales_nbr', 'display', 'picture_url'];
+    'name', 'sale_price', 'purchase_price', 
+   'stock'];
 
   /*========================= ADD ===========================================*/
 

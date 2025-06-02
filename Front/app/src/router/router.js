@@ -11,6 +11,7 @@ import Render3d from '../views/Render3d.vue';
 import Contact from '../views/Contact.vue';
 import Dash from '../views/DashBoard.vue';
 import DashBoardUsers from '../views/Users.vue';
+import DashBoardProduct from '../views/DashProduct.vue';
 
 const admin = 1;
 
@@ -25,6 +26,7 @@ const routes = [
   { path: '/contact', name: 'contact', component: Contact },
   { path: '/dash', name: 'dash', component: Dash, meta: { requiresAdmin: true } },
   { path: '/dash/users', name: 'dashUsers', component: DashBoardUsers, meta: { requiresAdmin: true } },
+  { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true } }
 ];
 
 const router = createRouter({
