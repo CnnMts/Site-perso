@@ -12,7 +12,7 @@ class Order extends Controller {
 
   public function __construct($param) {
     $this->order = new OrderModel();
-
+  $this->user = $param['user'] ?? null;
     parent::__construct($param);
   }
 
@@ -33,6 +33,16 @@ class Order extends Controller {
   public function getOrder() {
     return $this->order->get(intval($this->params['id']));
   }
+
+
+  /*======================== GET CART CLIENT ================================*/
+#[Route("GET", "/order/cart/:id"/*, middlewares: [AuthMiddleware::class]*/)]
+public function getCartOrder() {
+    $userId = intval($this->params['id']);
+    return $this->order->getCartByUserId($userId);
+}
+
+
 
   /*========================= GET ALL =======================================*/
 
@@ -55,6 +65,33 @@ class Order extends Controller {
     $orders = $this->order->getAllOrdersWithItems();
     return $orders;
 }
+
+
+
+/*===========================================================================*/
+  #[Route("GET", "/orders/:id/total-price")]
+  public function getOrderTotalPrice() {
+      $orderId = intval($this->params['id']);
+      $total = $this->order->calculateTotalPrice($orderId);
+        return ['order_id' => $orderId, 'total_price' => $total];
+}
+
+
+/*===========================================================================*/
+
+
+  #[Route("PATCH", "/orders/:id/update-total")]
+  public function updateOrderTotalPrice() {
+      $orderId = intval($this->params['id']);
+      $success = $this->order->updateTotalPrice($orderId);
+      if ($success) {
+        return ['order_id' => $orderId, 'message' => 'Total price updated successfully.'];
+      } else {
+          http_response_code(500);
+          return ['error' => 'Failed to update total price.'];
+      }
+}
+
 
 
   /*========================= PATCH =========================================*/

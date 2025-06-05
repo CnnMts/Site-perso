@@ -16,14 +16,27 @@ class OrderItem extends Controller {
     parent::__construct($param);
   }
 
+  private $user;
+
+public function setUser($user) {
+    $this->user = $user;
+}
+
   /*========================= POST ==========================================*/
 
-  #[Route("POST", "/orderItems")]
-  public function createOrderItem() {
-    $this->orderItem->add($this->body);
+  #[Route("POST", "/AddorderItems")]
+public function createOrderItem() {
+    $data = $this->body;
+
+    if (empty($data['product_id']) || empty($data['order_id']) || empty($data['name'])) {
+        throw new HttpException("Champs requis manquants", 400);
+    }
+
+    $this->orderItem->add($data);
 
     return $this->orderItem->getLast();
-  }
+}
+
 
   /*========================= GET BY ID =====================================*/
 

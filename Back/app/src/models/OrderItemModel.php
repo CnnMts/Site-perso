@@ -7,20 +7,46 @@ use stdClass;
 
 class OrderItemModel extends SqlConnect {
   private $table = "order_items";
-  public $authorized_fields_to_update = [
-    'order_id', 'menu_id', 'quantity'];
 
   /*========================= ADD ===========================================*/
 
   public function add(array $data) {
-    $query = "
-    INSERT INTO $this->table (product_id, order_id, name)
-    VALUES (:product_id, :order_id, :name)
-  ";
+    try {
+        if (empty($data['product_id']) || empty($data['order_id']) || empty($data['name'])) {
+            throw new Exception("Champs requis manquants.");
+        }
+        $sqlInsert = "INSERT INTO order_items (product_id, order_id, name) 
+                      VALUES (:product_id, :order_id, :name)";
+        $stmtInsert = $this->db->prepare($sqlInsert);
+        $stmtInsert->execute([
+            ':product_id' => $data['product_id'],
+            ':order_id' => $data['order_id'],
+            ':name' => $data['name'],
+        ]);
+        $sqlTotal = "
+            SELECT SUM(p.sale_price) AS total
+            FROM order_items oi
+            JOIN product p ON oi.product_id = p.id
+            WHERE oi.order_id = :order_id
+        ";
+        $stmtTotal = $this->db->prepare($sqlTotal);
+        $stmtTotal->execute([':order_id' => $data['order_id']]);
+        $result = $stmtTotal->fetch();
+        $total = $result['total'] ?? 0;
+        $sqlUpdateOrder = "UPDATE orders SET total_price = :total WHERE id = :order_id";
+        $stmtUpdate = $this->db->prepare($sqlUpdateOrder);
+        $stmtUpdate->execute([
+            ':total' => $total,
+            ':order_id' => $data['order_id'],
+        ]);
 
-    $req = $this->db->prepare($query);
-    $req->execute($data);
-}
+        return true;
+    } catch (PDOException $e) {
+        throw new Exception("Erreur SQL : " . $e->getMessage());
+    } catch (Exception $e) {
+        throw new Exception("Erreur : " . $e->getMessage());
+    }
+  }
 
 
   /*========================= GET BY ID  ====================================*/

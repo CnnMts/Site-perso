@@ -122,10 +122,6 @@ class OrderModel extends SqlConnect {
     return array_values($orders);
   }
 
-
-
-
-
   /*========================= GET LAST ======================================*/
 
   public function getLast() {
@@ -136,6 +132,83 @@ class OrderModel extends SqlConnect {
     return $req->rowCount() > 0 ? 
       $req->fetch(PDO::FETCH_ASSOC) : new stdClass();
   }
+
+
+  /*========================== GET PRICE ====================================*/
+
+ public function getOrderItemsWithPrices(int $orderId): array {
+    $sql = "
+      SELECT
+        order_items.order_id,
+        order_items.product_id,
+        product.name,
+        order_items.quantity,
+        product.sale_price AS unit_price,
+        (order_items.quantity * product.sale_price) AS total_price_per_item
+      FROM
+        order_items
+      JOIN
+        product ON order_items.product_id = product.id
+      WHERE
+        order_items.order_id = :orderId
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute(['orderId' => $orderId]);
+
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+
+
+
+/*=========================== GET CART CLIENT ===============================*/
+public function getCartByUserId(int $userId) {
+    $query = "
+        SELECT 
+            o.id AS order_id,
+            o.total_price,
+            o.status_id,
+            o.updated_at,
+            oi.id AS item_id,
+            oi.product_id,
+            p.name AS product_name,
+            p.sale_price
+        FROM orders o
+        LEFT JOIN order_items oi ON o.id = oi.order_id
+        LEFT JOIN product p ON oi.product_id = p.id
+        WHERE o.user_id = :user_id AND o.status_id = 1
+    ";
+
+    $req = $this->db->prepare($query);
+    $req->execute([':user_id' => $userId]);
+    $results = $req->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($results)) {
+        return null;
+    }
+
+    $cart = [
+        'order_id' => $results[0]['order_id'],
+        'total_price' => $results[0]['total_price'],
+        'status_id' => $results[0]['status_id'],
+        'updated_at' => $results[0]['updated_at'],
+        'items' => []
+    ];
+
+    foreach ($results as $row) {
+        if ($row['item_id']) {
+            $cart['items'][] = [
+                'item_id' => $row['item_id'],
+                'product_id' => $row['product_id'],
+                'product_name' => $row['product_name'],
+                'sale_price' => $row['sale_price']
+            ];
+        }
+    }
+
+    return $cart;
+}
+
 
   /*========================= UPDATE ========================================*/
 

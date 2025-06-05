@@ -1,16 +1,34 @@
 <template>
-  <div class="viewer-wrapper">
-    <div ref="threeCanvas" class="viewer-container"></div>
+  <div class="flex flex-col items-center p-4 sm:p-5 bg-gray-100 rounded-2xl shadow-[0_0px_30px_rgba(0,0,0,0.5)] max-w-md sm:max-w-2xl mx-auto">
+    <div
+      ref="threeCanvas"
+      class="w-full h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] rounded-2xl bg-gradient-to-br from-blue-100 to-white shadow-[inset_0_0_25px_rgba(255,255,255,0.8),0_20px_35px_rgba(0,0,0,0.5)] transition-shadow duration-300 hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.9),0_30px_60px_rgba(0,0,0,0.7)]"
+    ></div>
 
-    <div class="controls">
-      <button class="toggle-btn" @click="toggleRotation">
+    <div class="mt-4 sm:mt-5 flex gap-3 sm:gap-4 justify-center flex-wrap">
+      <button
+        @click="toggleRotation"
+        class="px-4 py-2 sm:px-5 sm:py-2 rounded-full border-0 font-semibold text-white cursor-pointer
+               bg-blue-700 shadow-md
+               hover:bg-blue-800 hover:shadow-lg
+               transition-colors transition-shadow duration-250 ease-in-out"
+      >
         {{ rotate ? 'Désactiver' : 'Activer' }} la rotation
       </button>
 
-      <button class="add-to-cart-btn" @click="addToCart">Ajouter au Panier</button>
+      <button
+        @click="addToCart"
+        class="px-4 py-2 sm:px-5 sm:py-2 rounded-full border-0 font-semibold text-gray-50 cursor-pointer
+               bg-purple-800 shadow-md
+               hover:bg-purple-900 hover:shadow-lg
+               transition-colors transition-shadow duration-250 ease-in-out"
+      >
+        Ajouter au Panier
+      </button>
     </div>
   </div>
 </template>
+
 
 <script>
 import * as THREE from 'three';
@@ -213,8 +231,9 @@ export default {
         const orderItemResponse = await orderItemModel.addOrderItem(orderItemData);
         console.log('Commande ajoutée :', { orderResponse, orderItemResponse });
         alert('Commande Effectuer');
-         this.$router.push('/');
+         this.$router.push('/cart');
       } catch (error) {
+        alert("Connecté vous pour faire votre panier")
         console.error("Erreur ajout panier :", error);
       }
     }
@@ -222,74 +241,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.viewer-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  background: #f5f7fa;
-  border-radius: 16px;
-  box-shadow: 0 0px 30px rgba(0, 0, 0, 0.5);
-  max-width: 540px;
-  margin: 0 auto;
-}
-
-.viewer-container {
-  width: 500px;
-  height: 500px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #e0e6f7, #ffffff);
-  box-shadow:
-    inset 0 0 25px rgba(255, 255, 255, 0.8),
-    0 20px 35px rgba(0, 0, 0, 0.5);
-  transition: box-shadow 0.3s ease;
-}
-
-.viewer-container:hover {
-  box-shadow:
-    inset 0 0 35px rgba(255, 255, 255, 0.9),
-    0 30px 60px rgba(0, 0, 0, 0.7);
-}
-
-.controls {
-  margin-top: 20px;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.toggle-btn,
-.add-to-cart-btn {
-  padding: 10px 20px;
-  border-radius: 30px;
-  border: none;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.toggle-btn {
-  background-color: #216fa3;
-  color: white;
-}
-
-.toggle-btn:hover {
-  background-color: #2b5ab8;
-  box-shadow: 0 6px 15px rgba(38, 94, 207, 0.5);
-}
-
-.add-to-cart-btn {
-  background-color: #881579;
-  color: #fdfdfd;
-}
-
-.add-to-cart-btn:hover {
-  background-color: #611164;
-  box-shadow: 0 6px 15px rgba(65, 2, 73, 0.562);
-}
-
-</style>

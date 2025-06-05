@@ -37,7 +37,6 @@
       </div>
     </div>
 
-    <!-- Modal -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <h2>Détail de la commande #{{ selectedOrder.id }}</h2>
@@ -71,7 +70,7 @@ export default {
     return {
       orders: [],
       selectedOrder: null,
-      orderItems: [], // <-- items de la commande
+      orderItems: [], 
       showModal: false,
     };
   },

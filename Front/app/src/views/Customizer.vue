@@ -1,27 +1,44 @@
 <template>
-  <div class="customizer-wrapper">
-    <div class="left-panel">
-      <h2>Personnalisation</h2>
-      <canvas ref="canvasRef" width="900" height="275" />
-      <input type="file" @change="onFileChange" />
-    </div>
-
-    <div class="right-panel">
-      <DViewModal :image="previewImage" :product="productType" />
-      
+  <div class="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 p-4 sm:p-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full mx-0">
+      <div class="bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 p-4 sm:p-6 rounded-xl shadow-xl flex flex-col items-start w-full">
+        <h2 class="text-xl sm:text-2xl font-bold text-purple-600 mb-4">Personnalisation</h2>
+        <div class="w-full mb-4">
+          <canvas
+            ref="canvasRef"
+            :width="canvasWidth"
+            :height="canvasHeight"
+            class="border rounded shadow-md w-full"
+          ></canvas>
+        </div>
+        <label class="mt-4 sm:mt-6 cursor-pointer inline-block bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow hover:from-pink-600 hover:to-purple-600 transition">
+          📁 Importer une image
+          <input
+            type="file"
+            @change="onFileChange"
+            class="hidden"
+          />
+        </label>
+      </div>
+      <div class="flex items-center justify-center bg-gray-100 p-4 sm:p-6 rounded-xl shadow-xl w-full">
+        <DViewModal :image="previewImage" :product="productType" />
+      </div>
     </div>
   </div>
 </template>
 
+
+
+
 <script>
 import * as fabric from "fabric";
-import _ from 'lodash';
+import _ from "lodash";
 import DViewModal from "@/components/3dViewModal.vue";
 
 export default {
   name: "Customizer",
   components: {
-    DViewModal
+    DViewModal,
   },
   data() {
     return {
@@ -30,12 +47,10 @@ export default {
       background: null,
       fileInputKey: 0,
       productType: "mug",
-      canvasWidth: 900,
+      canvasWidth: 500,
       canvasHeight: 275,
       backgroundColor: "#ffffff",
-      previewImage: null,
-      previewImage: "", 
-
+      previewImage: "",
     };
   },
   async mounted() {
@@ -46,16 +61,16 @@ export default {
 
     await this.$nextTick(() => {
       this.canvas = new fabric.Canvas(this.$refs.canvasRef, {
-      renderOnAddRemove: true,
-      selection: true,
-      preserveObjectStacking: true
+        renderOnAddRemove: true,
+        selection: true,
+        preserveObjectStacking: true,
       });
 
       this.updateCanvasSize(this.$route.params.id);
       this.createBackground();
 
       this.canvas.on("object:moving", () => {
-      this.updatePreviewImage();
+        this.updatePreviewImage();
       });
     });
   },
@@ -63,7 +78,7 @@ export default {
     updateCanvasSize(productId) {
       if (productId == 1) {
         this.productType = "mug";
-        this.canvasWidth = 900;
+        this.canvasWidth = 850;
         this.canvasHeight = 275;
       } else if (productId == 2) {
         this.productType = "tumbler";
@@ -88,25 +103,25 @@ export default {
     },
 
     createBackground() {
-  const bgRect = new fabric.Rect({
-    left: 0,
-    top: 0,
-    width: this.canvas.getWidth(),
-    height: this.canvas.getHeight(),
-    fill: this.backgroundColor || '#ffffff',
-    selectable: false,
-    evented: false,
-  });
+      const bgRect = new fabric.Rect({
+        left: 0,
+        top: 0,
+        width: this.canvas.getWidth(),
+        height: this.canvas.getHeight(),
+        fill: this.backgroundColor || "#ffffff",
+        selectable: false,
+        evented: false,
+      });
 
-  this.canvas.add(bgRect);
-  requestAnimationFrame(() => {
-    const lastIndex = this.canvas._objects.length - 1;
-    const lastObject = this.canvas._objects[lastIndex];
-    this.canvas._objects.splice(lastIndex, 1); 
-    this.canvas._objects.unshift(lastObject);
-    this.canvas.requestRenderAll();
-  });
-},
+      this.canvas.add(bgRect);
+      requestAnimationFrame(() => {
+        const lastIndex = this.canvas._objects.length - 1;
+        const lastObject = this.canvas._objects[lastIndex];
+        this.canvas._objects.splice(lastIndex, 1);
+        this.canvas._objects.unshift(lastObject);
+        this.canvas.requestRenderAll();
+      });
+    },
 
     updateBackgroundColor() {
       if (this.background) {
@@ -141,9 +156,10 @@ export default {
       const canvasAspect = this.canvasWidth / this.canvasHeight;
       const imgAspect = imgWidth / imgHeight;
 
-      const scale = imgAspect > canvasAspect
-        ? this.canvasWidth / imgWidth
-        : this.canvasHeight / imgHeight;
+      const scale =
+        imgAspect > canvasAspect
+          ? this.canvasWidth / imgWidth
+          : this.canvasHeight / imgHeight;
 
       imgInstance.set({
         left: (this.canvasWidth - imgWidth * scale) / 2,
@@ -154,7 +170,12 @@ export default {
 
       this.imgObj = imgInstance;
       this.canvas.add(this.imgObj);
-      this.imgObj.setControlsVisibility({ tl: true, tr: true, bl: true, br: true });
+      this.imgObj.setControlsVisibility({
+        tl: true,
+        tr: true,
+        bl: true,
+        br: true,
+      });
       this.canvas.setActiveObject(this.imgObj);
       this.canvas.renderAll();
       this.updatePreviewImage();
@@ -162,51 +183,13 @@ export default {
 
     updatePreviewImage: _.debounce(function () {
       if (this.canvas) {
-          this.previewImage = this.canvas.toDataURL({ format: 'png', quality: 1 });
+        this.previewImage = this.canvas.toDataURL({ format: "png", quality: 1 });
       }
-      }, 100),
-
-
+    }, 100),
 
     applyCustomization() {
       this.updatePreviewImage();
-    }
-  }
+    },
+  },
 };
 </script>
-
-<style scoped>
-canvas {
-  transition: all 0.05s linear;
-   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
-}
-
-.customizer-wrapper {
-  display: flex;
-  gap: 20px;
-}
-.left-panel, .right-panel {
-  flex: 1;
-  
-}
-.right-panel{
-  display: flex;
-  height: 98vh;
-  justify-content: center;
-  align-items: center;
-}
-.canvas-container {
-  margin: 20px;
-  border: 1px solid #ccc;
-}
-button {
-  padding: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #45a049;
-}
-</style>
