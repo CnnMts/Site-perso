@@ -39,6 +39,12 @@ class Order extends Controller {
 #[Route("GET", "/order/cart/:id"/*, middlewares: [AuthMiddleware::class]*/)]
 public function getCartOrder() {
     $userId = intval($this->params['id']);
+    $cart = $this->order->getCartByUserId($userId);
+    if ($cart === null) {
+        http_response_code(200);
+        echo json_encode(['cart' => null]);
+        exit;
+    };
     return $this->order->getCartByUserId($userId);
 }
 
@@ -54,6 +60,28 @@ public function getCartOrder() {
        intval($this->params['limit']) : null;
       return $this->order->getAll($limit);
   }
+
+  /*========================= GET ALL ORDER BY ID USER =====================*/
+
+#[Route("GET", "/ordersUserId/:id")]
+public function getAllOrdersByUser()
+{
+    if (!isset($this->params['id'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'ID utilisateur manquant']);
+        exit;
+    }
+
+    $userId = intval($this->params['id']);
+    $orders = $this->order->getAllOrdersByUserId($userId);
+    if (empty($orders)) {
+        http_response_code(200);
+        echo json_encode(['orders' => []]);
+        exit;
+    }
+
+    return $orders;
+}
 
   /*========================== GET WITH ITEMS ===============================*/
 
@@ -110,8 +138,6 @@ public function getCartOrder() {
       }
 
       # Check for missing fields
-      $missingFields = array_diff(
-        $this->order->authorized_fields_to_update, array_keys($data));
       if (!empty($missingFields)) {
         throw new HttpException(
           "Missing fields: " . implode(", ", $missingFields), 400);
@@ -125,6 +151,39 @@ public function getCartOrder() {
       throw $e;
     }
   }
+
+  /*========================= UPDATE STATUS =========================================*/
+#[Route("PATCH", "/ordersUpStatus/:id")]
+public function updateOrderStatus() {
+    try {
+        $id = intval($this->params['id']);
+        $data = $this->body;
+        if (empty($data)) {
+            throw new HttpException("Missing parameters for the update.", 400);
+        }
+
+        $existingOrder = $this->order->get($id);
+        if (!$existingOrder) {
+            throw new HttpException("Order not found.", 404);
+        }
+
+
+        if (isset($data['status_id'])) {
+            $existingOrder['status_id'] = $data['status_id'];
+        }
+
+        $this->order->updateStatus($existingOrder, $id);
+        if (intval($existingOrder['status_id']) === 2) {
+            $this->order->createEmptyCart($existingOrder['user_id']);
+        }
+
+        return $this->order->get($id);
+    } catch (HttpException $e) {
+        throw $e;
+    }
+}
+
+
 
   /*========================= TOGGLE =========================================*/
   #[Route("PATCH", "/orders/:id/toggle")]

@@ -17,17 +17,30 @@ class Auth extends Controller {
 
  /*========================= REGISTER =======================================*/
 
-  #[Route("POST", "/auth/register",
-  /*middlewares: [AuthMiddleware::class, 
-  [RoleMiddleware::class, Roles::ROLE_ADMIN]]*/)]
+  #[Route("POST", "/auth/register",)]
   public function register() {
       try {
-          $data = $this->body;
-          $user = $this->auth->register($data);
-          return $user;
-      } catch (\Exception $e) {
-          throw new HttpException($e->getMessage(), 400);
-      }
+        $data = $this->body;
+        $user = $this->auth->register($data);
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $_SESSION['user'] = $user;
+        $options = [
+            'expires'  => time() + 10000,
+            'path'     => '/',
+            'secure'   => false, 
+            'httponly' => false,
+            'samesite' => 'Lax'
+        ];
+        setcookie("pmaUser", $user['token'], $options);
+
+        return $user;
+
+    } catch (\Exception $e) {
+        throw new HttpException($e->getMessage(), 400);
+    }
   }
 
  /*========================= LOGIN ==========================================*/

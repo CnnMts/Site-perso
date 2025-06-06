@@ -8,7 +8,7 @@ use stdClass;
 class OrderModel extends SqlConnect {
   private $table = "orders";
   public $authorized_fields_to_update = [
-    'user_id', 'status_id', 'discount_id', 'payment_method_id'];
+    'status_id', 'discount_id', 'payment_method_id'];
 
   /*========================= ADD ===========================================*/
 
@@ -83,6 +83,52 @@ class OrderModel extends SqlConnect {
   }
 
 
+  /*===================== GET ALL ORDER BY USER ID ===============================*/
+  public function getAllOrdersByUserId($userId)
+{
+    $sql = "
+        SELECT 
+            orders.id,
+            orders.total_price,
+            orders.status_id,
+            orders.updated_at,
+            order_items.id AS item_id,
+            product.name
+        FROM orders
+        LEFT JOIN order_items ON orders.id = order_items.order_id
+        LEFT JOIN product ON order_items.product_id = product.id
+        WHERE orders.user_id = :user_id
+        ORDER BY orders.updated_at DESC
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute(['user_id' => $userId]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $orders = [];
+
+    foreach ($results as $row) {
+        $orderId = $row['id']; // orders.id
+        if (!isset($orders[$orderId])) {
+            $orders[$orderId] = [
+                'order_id' => $orderId,
+                'total_price' => $row['total_price'],
+                'status_id' => $row['status_id'],
+                'updated_at' => $row['updated_at'],
+                'items' => []
+            ];
+        }
+
+        if ($row['item_id']) {
+            $orders[$orderId]['items'][] = [
+                'item_id' => $row['item_id'],
+                'product_name' => $row['name'], // product.name
+                'sale_price' => $row['sale_price']
+            ];
+        }
+    }
+
+    return array_values($orders);
+}
 
   /*======================== GET WITH ITEMS =================================*/
   public function getAllOrdersWithItems() {
@@ -162,7 +208,26 @@ class OrderModel extends SqlConnect {
 
 
 /*=========================== GET CART CLIENT ===============================*/
-public function getCartByUserId(int $userId) {
+public function getCartByUserId(int $userId, ?int $statusId = null) {
+    $latestOrderQuery = "
+        SELECT id 
+        FROM orders 
+        WHERE user_id = :user_id" . 
+        ($statusId !== null ? " AND status_id = :status_id" : "") . "
+        ORDER BY updated_at DESC 
+        LIMIT 1
+    ";
+    $params = [':user_id' => $userId];
+    if ($statusId !== null) {
+        $params[':status_id'] = $statusId;
+    }
+    $req = $this->db->prepare($latestOrderQuery);
+    $req->execute($params);
+    $orderRow = $req->fetch(PDO::FETCH_ASSOC);
+    if (!$orderRow) {
+        return null;
+    }
+    $orderId = $orderRow['id'];
     $query = "
         SELECT 
             o.id AS order_id,
@@ -176,17 +241,14 @@ public function getCartByUserId(int $userId) {
         FROM orders o
         LEFT JOIN order_items oi ON o.id = oi.order_id
         LEFT JOIN product p ON oi.product_id = p.id
-        WHERE o.user_id = :user_id AND o.status_id = 1
+        WHERE o.id = :order_id
     ";
-
     $req = $this->db->prepare($query);
-    $req->execute([':user_id' => $userId]);
+    $req->execute([':order_id' => $orderId]);
     $results = $req->fetchAll(PDO::FETCH_ASSOC);
-
     if (empty($results)) {
         return null;
     }
-
     $cart = [
         'order_id' => $results[0]['order_id'],
         'total_price' => $results[0]['total_price'],
@@ -194,7 +256,6 @@ public function getCartByUserId(int $userId) {
         'updated_at' => $results[0]['updated_at'],
         'items' => []
     ];
-
     foreach ($results as $row) {
         if ($row['item_id']) {
             $cart['items'][] = [
@@ -205,7 +266,6 @@ public function getCartByUserId(int $userId) {
             ];
         }
     }
-
     return $cart;
 }
 
@@ -219,6 +279,41 @@ public function getCartByUserId(int $userId) {
 
     foreach ($data as $key => $value) {
       if (in_array($key, $this->authorized_fields_to_update)) {
+        $fields[] = "$key = :$key";
+        $params[":$key"] = $value;
+      }
+    }
+
+    $params[':id'] = $id;
+    $query = $request . implode(", ", $fields) . " WHERE id = :id";
+
+    $req = $this->db->prepare($query);
+    $req->execute($params);
+    
+    return $this->get($id);
+  }
+
+  /*========================= CREAT EMPTY CART =============================*/
+  public function createEmptyCart(int $userId): void {
+    $query = "
+        INSERT INTO $this->table (user_id, status_id, total_price, payment_method_id, picture)
+        VALUES (:user_id, 1, 0, NULL, NULL)
+    ";
+    $stmt = $this->db->prepare($query);
+    $stmt->execute([
+        'user_id' => $userId
+    ]);
+}
+
+   /*========================= UPDATE STATUS ================================*/
+
+  public function updateStatus(array $data, int $id) {
+    $request = "UPDATE $this->table SET ";
+    $params = [];
+    $fields = [];
+
+    foreach ($data as $key => $value) {
+      if (in_array($key, ['status_id'])) {
         $fields[] = "$key = :$key";
         $params[":$key"] = $value;
       }

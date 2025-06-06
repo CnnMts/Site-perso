@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import userModel from '@/models/userModel';
 export default {
   name: 'register',
 
@@ -32,38 +33,15 @@ export default {
     };
   },
   methods: {
-    async createUser(userData) {
-      try {
-        const response = await fetch('http://127.0.0.1:9999/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(userData),
-        });
-
-        if (!response.ok) {
-          throw new Error('Erreur lors de la connexion.');
-        }
-
-        const data = await response.json();
-        return data; 
-      } catch (error) {
-        console.error(error.message);
-        this.errorMessage = error.message;
-        return null;
-      }
-    },
 
     async handleSubmit() {
       const userData = {
         email: this.email,
         password: this.password,
       };
-      const createdUser = await this.createUser(userData);
+     const user = await userModel.logUser(userData);
 
-      if (createdUser) {
+      if (user) {
 
         alert(`Bienvenue ! Connexion réussie !`);
         this.email = '';

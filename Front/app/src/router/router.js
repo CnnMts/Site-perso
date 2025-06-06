@@ -12,7 +12,8 @@ import Contact from '../views/Contact.vue';
 import Dash from '../views/DashBoard.vue';
 import DashBoardUsers from '../views/Users.vue';
 import DashBoardProduct from '../views/DashProduct.vue';
-import Cart from '@/views/Cart.vue';
+import Cart from '../views/Cart.vue';
+import Account from '../views/AccountView.vue';
 
 const admin = 1;
 
@@ -26,6 +27,7 @@ const routes = [
   { path: '/render', name: 'render', component: Render3d },
   { path: '/contact', name: 'contact', component: Contact },
   { path: '/cart', name: 'cart', component: Cart },
+   { path: '/account', name: 'account', component: Account },
   { path: '/dash', name: 'dash', component: Dash, meta: { requiresAdmin: true } },
   { path: '/dash/users', name: 'dashUsers', component: DashBoardUsers, meta: { requiresAdmin: true } },
   { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true } }

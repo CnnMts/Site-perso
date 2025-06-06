@@ -23,6 +23,10 @@
         <input type="text" id="zip_code" v-model="zip_code" required />
       </div>
       <div>
+        <label for="city">Ville</label>
+        <input type="text" id="city" v-model="city" required />
+      </div>
+      <div>
         <label for="password">Mot de passe</label>
         <input type="password" id="password" v-model="password" required />
       </div>
@@ -39,6 +43,7 @@
 </template>
 
 <script>
+import { pushScopeId } from 'vue';
 import userModel from '../models/userModel'; 
 
 export default {
@@ -51,6 +56,7 @@ export default {
       password: '',
       address: '',
       zip_code: '',
+      city: '',
       confirmPassword: '',
       errorMessage: ''
     };
@@ -68,7 +74,9 @@ export default {
         email: this.email,
         password: this.password,
         address: this.address,
-        zip_code: this.zip_code
+        zip_code: this.zip_code,
+        city: this.city
+
       };
 
       const createdUser = await userModel.createUser(userData);
@@ -79,10 +87,12 @@ export default {
         this.email = '';
         this.address = '';
         this.zip_code = '';
+        this.city ='';
         this.password = '';
         this.confirmPassword = '';
         this.errorMessage = '';
-        console.log("Formulaire soumis avec succès !");
+       alert('Vous êtes enregistré avec succès , Bienvenue ')
+      this.$router.push('/');
       } else {
         this.errorMessage = "Une erreur est survenue lors de la création de l'utilisateur.";
       }

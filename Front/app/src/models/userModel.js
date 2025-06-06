@@ -13,6 +13,30 @@ export default {
     }
   },
 
+  async logUser(userData){
+      try {
+        const response = await fetch('http://127.0.0.1:9999/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(userData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la connexion.');
+        }
+
+        const data = await response.json();
+        return data; 
+      } catch (error) {
+        console.error(error.message);
+        this.errorMessage = error.message;
+        return null;
+      }
+    },
+
   async createUser(userData) {
     try {
       const response = await fetch('http://127.0.0.1:9999/auth/register', {
@@ -21,6 +45,7 @@ export default {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
+        credentials: "include",
       });
 
       if (!response.ok) {

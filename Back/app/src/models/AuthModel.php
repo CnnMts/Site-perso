@@ -22,12 +22,8 @@ class AuthModel extends SqlConnect {
       $query = "SELECT email FROM $this->table WHERE email = :email";
       $req = $this->db->prepare($query);
       $req->execute(["email" => $data["email"]]);
-  
-      if ($req->rowCount() > 0) {
-          throw new HttpException("User already exists!", 400);
-      }
-  
-   
+    
+ 
       $queryRole = "SELECT id FROM $this->tableRole WHERE name = :name";
       $reqRole = $this->db->prepare($queryRole);
       $reqRole->execute(['name' => 'admin']);
@@ -47,19 +43,17 @@ class AuthModel extends SqlConnect {
       $hashedPassword = password_hash($data["password"], PASSWORD_BCRYPT);
   
      
-      $requiredFields = ['name', 'email', 'password', 'firstname', 'address', 'zip_code'];
+      $requiredFields = ['name', 'email', 'password', 'firstname', 'address', 'zip_code', 'city'];
       foreach ($requiredFields as $field) {
           if (empty($data[$field])) {
               throw new Exception("Missing field: $field");
           }
       }
-  
-      // Créer l'utilisateur
       $queryAdd = "
           INSERT INTO $this->table (
-              name, email, password, firstname, address, zip_code
+              name, email, password, firstname, address, zip_code, city
           ) VALUES (
-               :name, :email, :password, :firstname, :address, :zip_code
+               :name, :email, :password, :firstname, :address, :zip_code, :city
           )
       ";
   
@@ -71,6 +65,7 @@ class AuthModel extends SqlConnect {
           "firstname" => $data['firstname'],
           "address"   => $data['address'],
           "zip_code"  => $data['zip_code'],
+          "city"  => $data['city'],
       ]);
   
       $userId = $this->db->lastInsertId();

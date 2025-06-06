@@ -40,7 +40,7 @@ use App\Controllers\{
     Role,
     User,
     ContactMessage
-};
+}; 
 
 $controllers = [
     Auth::class,

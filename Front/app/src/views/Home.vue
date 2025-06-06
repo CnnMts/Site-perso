@@ -66,6 +66,7 @@ export default {
         ?.split('=')[1];
       if (token) {
         const decoded = jwtDecode(token);
+        
         const userId = decoded.id;
         const currentUser = await userModel.getUserById(userId);
 
