@@ -1,11 +1,14 @@
 import { loadStripe } from '@stripe/stripe-js';
 
+const BASE_URL = `http://${window.location.hostname}:9999`
+
+
 const stripePubKey = import.meta.env.VITE_API_STRIPE_PUB;
 const stripePromise = loadStripe(stripePubKey);
 
 export async function createCheckoutSession(userId) {
   try {
-    const response = await fetch(`http://127.0.0.1:9999/stripe/checkout-session/${userId}`, {
+    const response = await fetch(`${BASE_URL}/stripe/checkout-session/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

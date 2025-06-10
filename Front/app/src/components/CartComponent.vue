@@ -10,7 +10,7 @@
 
     <div v-else-if="cart.status_id === 3">
       <div class="text-red-600">
-       <p>Vous n'avez plus de commande en cours</p>
+        <p>Vous n'avez plus de commande en cours</p>
       </div>
     </div>
 
@@ -50,88 +50,80 @@
   </div>
 </template>
 
+<script>
+import orderModel from '../models/orderModel';
 
-<script setup>
-import { ref, onMounted } from 'vue'
+export default {
+  data() {
+    return {
+      cart: null,
+      loading: true,
+      userId: null,
+    };
+  },
+  methods: {
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    },
+    async fetchCart() {
+      try {
+        const token = this.getCookie('pmaUser');
+        if (!token) {
+          console.error('Token missing in cookie pmaUser');
+          this.loading = false;
+          return;
+        }
 
-const cart = ref(null)
-const loading = ref(true)
+        const payload = token.split('.')[1];
+        const decodedPayload = atob(payload);
+        const payloadObj = JSON.parse(decodedPayload);
+        this.userId = payloadObj.id;
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) return parts.pop().split(';').shift()
-  return null
-}
+        if (!this.userId) {
+          console.error('Token ID is missing in the token payload');
+          this.loading = false;
+          return;
+        }
 
-const fetchCart = async () => {
-  try {
-    const token = getCookie('pmaUser')
-    if (!token) {
-      console.error('Token missing in cookie pmaUser')
-      loading.value = false
-      return
-    }
+        const data = await orderModel.getCartClient(this.userId);
+        this.cart = data;
+      } catch (err) {
+        console.error('Erreur récupération panier :', err);
+        this.cart = null;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async changeStatus() {
+      if (!this.cart || !this.cart.order_id) {
+        alert('Aucune commande active');
+        return;
+      }
 
-    const payload = token.split('.')[1]
-    const decodedPayload = atob(payload)
-    const payloadObj = JSON.parse(decodedPayload)
-    const userId = payloadObj.id
-
-    if (!userId) {
-      console.error('Token ID is missing in the token payload')
-      loading.value = false
-      return
-    }
-
-    const response = await fetch(`http://127.0.0.1:9999/order/cart/${userId}`)
-    const text = await response.text()
-    cart.value = JSON.parse(text)
-    console.log(cart.value)
-  } catch (err) {
-    console.error('Erreur récupération panier :', err)
-    cart.value = null
-  } finally {
-    loading.value = false
-  }
-}
-
-const changeStatus = async () => {
-  if (!cart.value || !cart.value.order_id) {
-    alert('Aucune commande active')
-    return
-  }
-
-  try {
-    const orderId = cart.value.order_id
-    const resOrder = await fetch(`http://127.0.0.1:9999/orders/${orderId}`)
-    if (!resOrder.ok) throw new Error('Erreur récupération commande')
-
-    const order = await resOrder.json()
-    console.log(order.status_id)
-
-    if (order.status_id === 3) {
-      alert('Commande déjà payée.')
-      return
-    }
-    const paid = 3;
-    const resPatch = await fetch(`http://127.0.0.1:9999/ordersUpStatus/${orderId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status_id: paid })
-
-    })
-
-    if (!resPatch.ok) throw new Error('Erreur mise à jour statut')
-
-    alert('Statut de la commande mis à jour en "payé" (3).')
-    await fetchCart()
-  } catch (error) {
-    console.error(error)
-    alert('Erreur lors de la mise à jour du statut.')
-  }
-}
-
-onMounted(fetchCart)
+      try {
+        const orderId = this.cart.order_id;
+        if (!this.userId) throw new Error('Utilisateur non défini');
+        const order = await orderModel.getCartClient(this.userId);
+        if (!order) throw new Error('Erreur récupération commande');
+        if (order.status_id === 3) {
+          alert('Commande déjà payée.');
+          return;
+        }
+        await orderModel.updateOrderStatus(orderId, 3);
+        alert('Merci pour votre achat.');
+        await this.fetchCart();
+        this.$router.push('/');
+      } catch (error) {
+        console.error(error);
+        alert('Erreur lors de la mise à jour du statut.');
+      }
+    },
+  },
+  mounted() {
+    this.fetchCart();
+  },
+};
 </script>
-

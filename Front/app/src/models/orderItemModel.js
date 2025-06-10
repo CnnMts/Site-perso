@@ -1,7 +1,10 @@
+const BASE_URL = `http://${window.location.hostname}:9999`
+
+
 const orderItemModel = {
   async addOrderItem(orderItemData) {
     try {
-      const response = await fetch('http://127.0.0.1:9999/AddorderItems', {
+      const response = await fetch(`${BASE_URL}/AddorderItems`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderItemData),

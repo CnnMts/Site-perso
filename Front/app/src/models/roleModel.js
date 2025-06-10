@@ -1,7 +1,9 @@
+const BASE_URL = `http://${window.location.hostname}:9999`
+
 export default {
     async getRoleById(id){
         try {
-          const response = await fetch('http://127.0.0.1:9999/role/:id');
+          const response = await fetch(`${BASE_URL}/role/:id`);
           if (!response.ok) {
             throw new Error('Réponse du serveur non valide');
           }

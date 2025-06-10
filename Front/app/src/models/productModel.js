@@ -1,8 +1,10 @@
+const BASE_URL = `http://${window.location.hostname}:9999`
+
 export default {
 
     async getProduct() {
       try {
-        const response = await fetch('http://127.0.0.1:9999/product');
+        const response = await fetch(`${BASE_URL}/product`);
         if (!response.ok) {
           throw new Error('Réponse du serveur non valide');
         }
@@ -16,7 +18,7 @@ export default {
 
     async getProductById(id) {
       try {
-        const response = await fetch(`http://127.0.0.1:9999/product/${id}`);
+        const response = await fetch(`${BASE_URL}/product/${id}`);
         if (!response.ok) {
           throw new Error('Réponse du serveur non valide');
         }
