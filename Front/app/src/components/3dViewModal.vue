@@ -204,39 +204,49 @@ export default {
       });
     },
 
-    async addToCart() {
-      if (!this.image) {
-        console.error("Aucune image disponible pour l'ajout au panier.");
-        return;
-      }
-      try {
-        const orderData = {
-          user_id: this.userId,
-          status_id: this.statusId,
-          total_price: this.price,
-          payment_method_id: this.paymentMethodId,
-          picture: this.image,
-        };
+   async addToCart() {
+  if (!this.image) {
+    console.error("Aucune image disponible pour l'ajout au panier.");
+    return;
+  }
+  try {
+    const orderData = {
+      user_id: this.userId,
+      status_id: this.statusId,
+      total_price: this.price,
+      payment_method_id: this.paymentMethodId,
+    };
 
-        const orderResponse = await orderModel.addOrder(orderData);
-        const orderId = orderResponse.id;
+    console.log("Données de la commande envoyées:", orderData); // Vérifiez les données envoyées
 
-        const orderItemData = {
-          order_id: orderId,
-          product_id: this.productId,
-          name: this.productName,
-        };
+    const orderResponse = await orderModel.addOrder(orderData);
+    console.log("Réponse création commande:", orderResponse);
 
-        const orderItemResponse = await orderItemModel.addOrderItem(orderItemData);
-        console.log('Commande ajoutée :', { orderResponse, orderItemResponse });
-        alert('Commande Effectuer');
-         this.$router.push('/cart');
-      } catch (error) {
-        alert("Connecté vous pour faire votre panier")
-        console.error("Erreur ajout panier :", error);
-      }
+    const orderId = orderResponse.id;
+    console.log("ID de la commande reçue:", orderId);
+
+    if (!orderId) {
+      throw new Error("L'ID de la commande est undefined.");
     }
+
+    const orderItemData = {
+      order_id: orderId,
+      product_id: this.productId,
+      name: this.productName,
+      picture: this.image,
+    };
+
+    const orderItemResponse = await orderItemModel.addOrderItem(orderItemData);
+    console.log('Commande ajoutée :', { orderResponse, orderItemResponse });
+    alert('Commande effectuée');
+    this.$router.push('/cart');
+  } catch (error) {
+    alert("Connectez-vous pour faire votre panier");
+    console.error("Erreur ajout panier :", error);
+  }
+}
+
+
   }
 };
 </script>
-

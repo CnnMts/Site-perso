@@ -3,16 +3,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full mx-0">
       <div class="bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 p-4 sm:p-6 rounded-xl shadow-xl flex flex-col items-start w-full">
         <h2 class="text-xl sm:text-2xl font-bold text-purple-600 mb-4">Personnalisation</h2>
-        <div class="w-full mb-4">
-          <canvas
-            ref="canvasRef"
-            :width="canvasWidth"
-            :height="canvasHeight"
-            class="border rounded shadow-md w-full"
-          ></canvas>
-        </div>
+       <div ref="canvasContainer" class="w-full mb-4" :class="aspectRatioClass"  >
+        <canvas
+          ref="canvasRef"
+          :width="canvasWidth"
+          :height="canvasHeight"
+          class="border rounded shadow-md w-full h-full">
+        </canvas>
+      </div>
+
         <label class="mt-4 sm:mt-6 cursor-pointer inline-block bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow hover:from-pink-600 hover:to-purple-600 transition">
-          📁 Importer une image
+          Importer une image
           <input
             type="file"
             @change="onFileChange"
@@ -25,6 +26,7 @@
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 
@@ -34,11 +36,13 @@
 import * as fabric from "fabric";
 import _ from "lodash";
 import DViewModal from "@/components/3dViewModal.vue";
+import Footer from "@/components/Footer.vue";
 
 export default {
   name: "Customizer",
   components: {
     DViewModal,
+    Footer,
   },
   data() {
     return {
@@ -53,27 +57,41 @@ export default {
       previewImage: "",
     };
   },
-  async mounted() {
-    if (!this.$route.params.id) {
-      console.error("Product ID is missing");
-      return;
-    }
-
-    await this.$nextTick(() => {
-      this.canvas = new fabric.Canvas(this.$refs.canvasRef, {
-        renderOnAddRemove: true,
-        selection: true,
-        preserveObjectStacking: true,
-      });
-
-      this.updateCanvasSize(this.$route.params.id);
-      this.createBackground();
-
-      this.canvas.on("object:moving", () => {
-        this.updatePreviewImage();
-      });
-    });
+  computed: {
+  aspectRatioClass() {
+    const ratios = {
+      mug: 'aspect-[950/275]',
+      tumbler: 'aspect-[730/272]',
+    };
+    return ratios[this.productType] || 'aspect-[950/275]'; 
   },
+},
+  async mounted() {
+  if (!this.$route.params.id) {
+    console.error("Product ID is missing");
+    return;
+  }
+
+  await this.$nextTick(() => {
+    this.canvas = new fabric.Canvas(this.$refs.canvasRef, {
+      renderOnAddRemove: true,
+      selection: true,
+      preserveObjectStacking: true,
+    });
+
+    this.updateCanvasSize(this.$route.params.id);
+    this.createBackground();
+
+    this.canvas.on("object:moving", () => {
+      this.updatePreviewImage();
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+      this.resizeCanvasToContainer();
+    });
+    resizeObserver.observe(this.$refs.canvasContainer);
+  });
+},
   methods: {
     updateCanvasSize(productId) {
       if (productId == 1) {
@@ -101,6 +119,16 @@ export default {
         this.canvas.sendToBack(this.background);
       }
     },
+
+    resizeCanvasToContainer() {
+      const container = this.$refs.canvasContainer;
+      if (!container) return;
+      const { clientWidth, clientHeight } = container;
+      this.canvas.setWidth(clientWidth);
+      this.canvas.setHeight(clientHeight);
+      this.canvas.renderAll();
+    },
+
 
     createBackground() {
       const bgRect = new fabric.Rect({

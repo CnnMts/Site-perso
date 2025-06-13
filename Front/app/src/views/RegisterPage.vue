@@ -15,7 +15,4 @@ export default {
 </script>
 
 <style scoped>
-.register-page {
-  padding: 20px;
-}
 </style>

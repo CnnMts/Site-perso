@@ -11,44 +11,38 @@ class OrderModel extends SqlConnect {
     'status_id', 'discount_id', 'payment_method_id'];
 
   /*========================= ADD ===========================================*/
-
   public function add(array $data) {
-    $statusTest = 1;
-    $paymentMethodPaypal = 1;
-    $checkQuery = "
-        SELECT COUNT(*)
-        FROM $this->table
-        WHERE user_id = :user_id AND status_id = :status_id
-    ";
-
-    $checkReq = $this->db->prepare($checkQuery);
-    $checkReq->execute([
-        'user_id' => $data['user_id'],
-        'status_id' => $data['status_id']
-    ]);
-
-    $orderExists = (bool) $checkReq->fetchColumn();
-
-    if ($orderExists) {
-        if ($data['status_id'] === $statusTest && $data['payment_method_id'] === $paymentMethodPaypal) {
-            $query = "
-              UPDATE $this->table
-              SET total_price = :total_price,
-                  picture = :picture
-              WHERE user_id = :user_id AND status_id = :status_id AND payment_method_id = :payment_method_id
-            ";
+    try {
+        $sqlCheck = "SELECT id, status_id FROM orders WHERE user_id = :user_id AND status_id != 3 ORDER BY id DESC LIMIT 1";
+        $stmtCheck = $this->db->prepare($sqlCheck);
+        $stmtCheck->execute([':user_id' => $data['user_id']]);
+        $existingOrder = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        if ($existingOrder !== false && !empty($existingOrder)) {
+            $orderId = $existingOrder['id'];
+            $sqlUpdate = "UPDATE orders SET total_price = total_price + :total_price WHERE id = :id";
+            $stmtUpdate = $this->db->prepare($sqlUpdate);
+            $stmtUpdate->execute([
+                ':total_price' => $data['total_price'],
+                ':id' => $orderId
+            ]);
+        } else {
+            $sqlInsert = "INSERT INTO orders (user_id, status_id, total_price, payment_method_id) VALUES (:user_id, :status_id, :total_price, :payment_method_id)";
+            $stmtInsert = $this->db->prepare($sqlInsert);
+            $stmtInsert->execute([
+                ':user_id' => $data['user_id'],
+                ':status_id' => $data['status_id'],
+                ':total_price' => $data['total_price'],
+                ':payment_method_id' => $data['payment_method_id'],
+            ]);
+            $orderId = $this->db->lastInsertId();
         }
-    } else {
-        $query = "
-          INSERT INTO $this->table (user_id, status_id, total_price, payment_method_id, picture)
-          VALUES (:user_id, :status_id, :total_price, :payment_method_id, :picture)
-        ";
+
+        return ['id' => $orderId];
+
+    } catch (PDOException $e) {
+        throw new Exception("Erreur SQL : " . $e->getMessage());
     }
-
-    $req = $this->db->prepare($query);
-    $req->execute($data);
-}
-
+  }
 
 
   /*========================= GET ===========================================*/

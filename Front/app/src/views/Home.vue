@@ -26,9 +26,11 @@
       </div>
     </section>
   </div>
+   <Footer />
 </template>
 
 <script>
+import Footer from '@/components/Footer.vue';
 import NavBar from '@/components/NavBar.vue';
 import ProductCard from '@/components/ProductCard.vue'; 
 import productModel from '@/models/productModel';
@@ -40,7 +42,8 @@ export default {
   name: 'Home',
   components: {
     NavBar,
-    ProductCard  
+    ProductCard,
+    Footer
   },
   data() {
     return {

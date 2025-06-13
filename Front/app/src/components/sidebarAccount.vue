@@ -1,69 +1,79 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100">
-    <aside class="w-64 bg-white shadow-lg p-6">
-      <h2 class="text-xl font-semibold mb-6">Mon Compte</h2>
-      <nav class="space-y-4">
-        <button class="w-full text-left p-2 rounded hover:bg-gray-200" @click="selected = 'settings'">
+  <div class="flex min-h-screen bg-gray-50 text-gray-800">
+    <aside class="w-72 bg-white shadow-xl px-6 py-8 border-r border-gray-200">
+      <a href="/"><h2 class="text-2xl font-bold text-indigo-600 mb-8">Mon Compte</h2></a>
+      <nav class="flex flex-col gap-4">
+        <button
+          class="w-full text-left px-4 py-2 rounded-lg transition-all duration-150"
+          :class="selected === 'settings' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100'"
+          @click="selected = 'settings'"
+        >
           Paramètres du compte
         </button>
-        <button class="w-full text-left p-2 rounded hover:bg-gray-200" @click="selected = 'payment'">
+        <button
+          class="w-full text-left px-4 py-2 rounded-lg transition-all duration-150"
+          :class="selected === 'payment' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100'"
+          @click="selected = 'payment'"
+        >
           Paiement & Livraison
         </button>
-        <button class="w-full text-left p-2 rounded hover:bg-gray-200" @click="selected = 'history'">
+        <button
+          class="w-full text-left px-4 py-2 rounded-lg transition-all duration-150"
+          :class="selected === 'history' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100'"
+          @click="selected = 'history'"
+        >
           Historique des commandes
         </button>
       </nav>
     </aside>
-
-    <div class="flex-1 p-8">
-      <!-- Paramètres -->
-      <div v-if="selected === 'settings'" class="Setting-account">
-        <h3 class="text-2xl font-bold mb-4">Paramètres du compte</h3>
-        <div v-if="user">
+    <div class="flex-1 p-10">
+      <section v-if="selected === 'settings'" class="Setting-account">
+        <h3 class="text-3xl font-bold text-gray-700 mb-6">Paramètres du compte</h3>
+        <div v-if="user" class="space-y-2 text-lg">
           <p><strong>Nom :</strong> {{ user.name }}</p>
           <p><strong>Prénom :</strong> {{ user.firstname }}</p>
           <p><strong>Email :</strong> {{ user.email }}</p>
         </div>
-        <div v-else>
-          <p>Chargement des informations...</p>
-        </div>
-      </div>
-
-      <!-- Paiement & Livraison -->
-      <div v-else-if="selected === 'payment'" class="Payment-delivery">
-        <h3 class="text-2xl font-bold mb-4">Paiement & Livraison</h3>
-        <div v-if="user">
+        <div v-else class="text-gray-500">Chargement des informations...</div>
+      </section>
+      <section v-else-if="selected === 'payment'" class="Payment-delivery">
+        <h3 class="text-3xl font-bold text-gray-700 mb-6">Paiement & Livraison</h3>
+        <div v-if="user" class="space-y-2 text-lg">
           <p><strong>Adresse :</strong> {{ user.address }}</p>
           <p><strong>Code postal :</strong> {{ user.zip_code }}</p>
           <p><strong>Ville :</strong> {{ user.city }}</p>
         </div>
-      </div>
+      </section>
+      <section v-else-if="selected === 'history'" class="history-of-command">
+        <h3 class="text-3xl font-bold text-gray-700 mb-6">Historique des commandes</h3>
 
-      <!-- Historique des commandes -->
-      <div v-else-if="selected === 'history'" class="history-of-command">
-        <h3 class="text-2xl font-bold mb-4">Historique des commandes</h3>
-
-        <div v-if="orders.length > 0">
-          <div v-for="order in orders" :key="order.order_id" class="mb-8 p-4 bg-white rounded shadow">
-            <p><strong>Numéro de Commande :</strong> {{ order.order_id }}</p>
+        <div v-if="orders.length > 0" class="space-y-6">
+          <div
+            v-for="order in orders"
+            :key="order.order_id"
+            class="p-6 bg-white rounded-lg shadow border border-gray-200"
+          >
+            <p class="text-lg"><strong>Numéro :</strong> {{ order.order_id }}</p>
             <p><strong>Total :</strong> {{ order.total_price }} €</p>
             <p><strong>Statut :</strong> {{ getStatusText(order.status_id) }}</p>
-            <p><strong>Fait le :</strong> {{ formatFrenchDateWithYear(order.updated_at) }}</p>
-            <h4 class="text-xl font-semibold mt-4 mb-2">Articles :</h4>
-            <ul>
-              <li v-for="item in order.items" :key="item.item_id">
-                - {{ item.product_name }} ({{ item.sale_price }} €)
-              </li>
-            </ul>
+            <p><strong>Date :</strong> {{ formatFrenchDateWithYear(order.updated_at) }}</p>
+            <div v-if="order.items?.length" class="mt-4">
+              <h4 class="text-md font-semibold mb-2"> Articles :</h4>
+              <ul class="list-disc list-inside text-gray-700">
+                <li v-for="item in order.items" :key="item.item_id">
+                  {{ item.product_name }}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div v-else>
-          <p>Aucune commande effectuée.</p>
-        </div>
-      </div>
+
+        <div v-else class="text-gray-500">Aucune commande effectuée.</div>
+      </section>
     </div>
   </div>
 </template>
+
 
 <script scoped>
 import orderModel from '@/models/orderModel';

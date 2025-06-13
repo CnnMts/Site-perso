@@ -6,7 +6,7 @@
       @click="openModal"
       class="bg-green-600 text-white px-4 py-2 rounded mb-4"
     >
-      ➕ Ajouter un produit
+       Ajouter un produit
     </button>
 
     <div
@@ -21,7 +21,7 @@
           @click="closeModal"
           class="absolute top-2 right-2 text-gray-500 hover:text-black"
         >
-          ✖
+          
         </button>
 
         <h2 class="text-xl font-semibold mb-4">
@@ -114,15 +114,15 @@
         <div class="space-x-2">
           <button
             @click="fillForm(product)"
-            class="text-yellow-600 hover:text-yellow-800"
+            class="text-violet-600 hover:text-yellow-800"
           >
-            ✏️
+          Edit
           </button>
           <button
             @click="deleteProduct(product.id)"
             class="text-red-600 hover:text-red-800"
           >
-            🗑️
+            Delete
           </button>
         </div>
       </li>

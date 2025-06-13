@@ -1,53 +1,127 @@
 <template>
-  <div class="register-form">
-    <h1>Créer un compte</h1>
-    <form @submit.prevent="handleSubmit">
-      <div>
-        <label for="name">Nom</label>
-        <input type="text" id="name" v-model="name" required />
-      </div>
-      <div>
-        <label for="firstname">Prénom</label>
-        <input type="text" id="firstname" v-model="firstname" required />
-      </div>
-      <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" v-model="email" required />
-      </div>
-      <div>
-        <label for="address">Adresse</label>
-        <input type="text" id="address" v-model="address" required />
-      </div>
-      <div>
-        <label for="zip_code">Code Postal</label>
-        <input type="text" id="zip_code" v-model="zip_code" required />
-      </div>
-      <div>
-        <label for="city">Ville</label>
-        <input type="text" id="city" v-model="city" required />
-      </div>
-      <div>
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <div>
-        <label for="confirmPassword">Confirmer le mot de passe</label>
-        <input type="password" id="confirmPassword" v-model="confirmPassword" required />
-      </div>
-      <button type="submit">S'inscrire</button>
-      <div v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
-    </form>
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500">
+    <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+      <h1 class="text-3xl font-bold text-center text-violet-700 mb-6">Créer un compte</h1>
+      <form @submit.prevent="handleSubmit" class="space-y-4">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">Nom</label>
+          <input
+            type="text"
+            id="name"
+            v-model="name"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+          />
+        </div>
+
+        <div>
+          <label for="firstname" class="block text-sm font-medium text-gray-700">Prénom</label>
+          <input
+            type="text"
+            id="firstname"
+            v-model="firstname"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+          />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            type="email"
+            id="email"
+            v-model="email"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+          />
+        </div>
+
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700">Adresse</label>
+          <input
+            type="text"
+            id="address"
+            v-model="address"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+          />
+        </div>
+
+        <div>
+          <label for="zip_code" class="block text-sm font-medium text-gray-700">Code Postal</label>
+          <input
+            type="text"
+            id="zip_code"
+            v-model="zip_code"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+          />
+        </div>
+
+        <div>
+          <label for="city" class="block text-sm font-medium text-gray-700">Ville</label>
+          <input
+            type="text"
+            id="city"
+            v-model="city"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            v-model="password"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+          />
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            v-model="confirmPassword"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-2 px-4 bg-gradient-to-r from-violet-600 to-pink-500 text-white font-semibold rounded-lg shadow-md hover:from-violet-700 hover:to-pink-600 transition duration-200"
+        >
+          S'inscrire
+        </button>
+
+        <p v-if="errorMessage" class="text-red-600 text-sm mt-2 text-center">
+          {{ errorMessage }}
+        </p>
+        <p v-if="successMessage" class="text-green-600 text-sm mt-2 text-center">
+        {{ successMessage }}
+        </p>
+
+
+        <p class="text-sm text-center mt-4 text-gray-700">
+          Vous avez déjà un compte ?
+          <router-link to="/login" class="text-violet-600 hover:underline font-medium">
+            Connectez-vous
+          </router-link>
+        </p>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
-import { pushScopeId } from 'vue';
-import userModel from '../models/userModel'; 
+import userModel from '../models/userModel';
 
 export default {
-  name: 'register',
+  name: 'RegisterForm',
   data() {
     return {
       firstname: '',
@@ -58,7 +132,8 @@ export default {
       zip_code: '',
       city: '',
       confirmPassword: '',
-      errorMessage: ''
+      errorMessage: '',
+      successMessage: ''
     };
   },
   methods: {
@@ -75,8 +150,7 @@ export default {
         password: this.password,
         address: this.address,
         zip_code: this.zip_code,
-        city: this.city
-
+        city: this.city,
       };
 
       const createdUser = await userModel.createUser(userData);
@@ -87,47 +161,21 @@ export default {
         this.email = '';
         this.address = '';
         this.zip_code = '';
-        this.city ='';
+        this.city = '';
         this.password = '';
         this.confirmPassword = '';
         this.errorMessage = '';
-       alert('Vous êtes enregistré avec succès , Bienvenue ')
-      this.$router.push('/');
+        
+        this.successMessage = "Inscription réussie ! Redirection...";
+        setTimeout(() => {
+          this.successMessage = '';
+          this.$router.push('/login');
+        }, 2000);
       } else {
         this.errorMessage = "Une erreur est survenue lors de la création de l'utilisateur.";
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style scoped>
-.register-form {
-  width: 300px;
-  margin: 0 auto;
-}
-
-input {
-  width: 100%;
-  padding: 8px;
-  margin: 5px 0;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-.error-message {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
-}
-</style>

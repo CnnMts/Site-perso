@@ -16,7 +16,7 @@
           @click="goToCustomizer"
           class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 sm:px-6 sm:py-2 rounded-full shadow hover:from-pink-600 hover:to-indigo-600 transition-all"
         >
-          🎨 Personnaliser ce produit
+          Personnaliser ce produit
         </button>
       </div>
     </div>

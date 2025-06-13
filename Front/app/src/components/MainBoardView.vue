@@ -9,25 +9,7 @@
         class="order-card"
         @click="openModal(order)"
       >
-        <div class="image-section">
-          <img
-            v-if="order.picture"
-            :src="order.picture"
-            alt="Image à sublimer"
-            class="preview-image"
-          />
-          <canvas v-else class="preview-canvas"></canvas>
-          <a
-            v-if="order.picture"
-            :href="order.picture"
-            :download="`commande_${order.id}.png`"
-            class="download-button"
-            @click.stop
-          >
-            Télécharger
-          </a>
-        </div>
-
+      
         <div class="info-section">
           <p><strong>Commande #{{ order.id }}</strong></p>
           <p>Client : {{ order.user_name }} {{ order.user_firstname }}</p>
@@ -44,11 +26,31 @@
         <p><strong>Date :</strong> {{ formatDate(selectedOrder.updated_at) }}</p>
         <p><strong>Total :</strong> {{ selectedOrder.total_price }} €</p>
         <h3>Articles associés :</h3>
-        <ul>
-          <li v-for="item in orderItems" :key="item.id">
-            {{ item.name }} - Quantité : {{ item.quantity }} - Prix : {{ item.price }} €
-          </li>
-        </ul>
+        <h3>Articles associés :</h3>
+<div class="items-gallery">
+  <div v-for="item in orderItems" :key="item.name" class="item-card">
+    <img
+      v-if="item.picture"
+      :src="item.picture"
+      :alt="`Image de ${item.name}`"
+      class="item-image"
+    />
+    <div class="item-info">
+      <p><strong>{{ item.name }}</strong></p>
+      <p>Quantité : {{ item.quantity }}</p>
+      <p>Prix : {{ item.price ?? 'N/A' }} €</p>
+      <a
+        v-if="item.picture"
+        :href="item.picture"
+        :download="`item_${item.name}.png`"
+        class="download-button"
+        @click.stop
+      >Télécharger l'image</a>
+    </div>
+  </div>
+</div>
+
+
         <img
           v-if="selectedOrder.picture"
           :src="selectedOrder.picture"
@@ -63,20 +65,33 @@
 
 <script>
 import orderModel from '@/models/orderModel';
+import orderItemModel from '@/models/orderItemModel';
 import userModel from '@/models/userModel';
 
 export default {
-   data() {
+  data() {
     return {
       orders: [],
       selectedOrder: null,
-      orderItems: [], 
+      orderItems: [],
       showModal: false,
+      token: null,
     };
   },
+
   async mounted() {
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    this.token = getCookie('pmaUser');
+
     try {
       const response = await orderModel.getOrders();
+
       const ordersWithUsernames = await Promise.all(
         response.map(async (order) => {
           try {
@@ -101,32 +116,39 @@ export default {
       console.error("Erreur lors du chargement des commandes :", error);
     }
   },
+
   methods: {
     formatDate(dateString) {
       return new Date(dateString).toLocaleString("fr-FR");
     },
+
     async openModal(order) {
       this.selectedOrder = order;
       this.showModal = true;
-        try {
-          const response = await fetch(`http://127.0.0.1:9999/ordersItems?orderId=${order.id}`);
-          if (!response.ok) throw new Error("Erreur API");
-            const data = await response.json();
-            const foundOrder = data.find(o => o.id === order.id);
-            const groupedItems = {};
-              (foundOrder?.items || []).forEach(item => {
-              if (groupedItems[item.name]) {
-                groupedItems[item.name].quantity += 1;
-              } else {
-                 groupedItems[item.name] = { name: item.name, quantity: 1 };
-              }
-          });
-          this.orderItems = Object.values(groupedItems);
-        } catch (error) {
+
+      if (!this.token) {
+        console.error("Token manquant !");
+        this.orderItems = [];
+        return;
+      }
+      orderItemModel.setToken(this.token);
+      try {
+        const data = await orderItemModel.getOrderByOrderId(order.id, this.token);
+        console.log("Données reçues de l'API :", data);
+
+        if (!Array.isArray(data)) {
+          console.error("La réponse n'est pas un tableau :", data);
+          this.orderItems = [];
+          return;
+        }
+        this.orderItems = data;
+
+      } catch (error) {
         console.error("Erreur lors du chargement des items :", error);
         this.orderItems = [];
-        }
+      }
     },
+
 
     closeModal() {
       this.selectedOrder = null;
@@ -169,14 +191,13 @@ export default {
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
   gap: 20px;
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .order-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
-
-
 
 .image-section {
   display: flex;
@@ -264,4 +285,52 @@ export default {
 .modal-content button:hover {
   background-color: #b91c1c;
 }
+
+.items-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.item-card {
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 12px;
+  width: 140px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.download-button {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  text-decoration: none;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.download-button:hover {
+  background-color: #1e40af;
+  cursor: pointer;
+}
+
 </style>

@@ -66,12 +66,9 @@ public function createOrderItem() {
       $id = intval($this->params['id']);
       $data = $this->body;
 
-      # Check if the data is empty
       if (empty($data)) {
         throw new HttpException("Missing parameters for the update.", 400);
       }
-
-      # Check for missing fields
       $missingFields = array_diff(
         $this->orderItem->authorized_fields_to_update, array_keys($data));
       if (!empty($missingFields)) {
@@ -80,13 +77,23 @@ public function createOrderItem() {
       }
 
       $this->orderItem->update($data, intval($id));
-
-      # Let's return the updated order
       return $this->orderItem->get($id);
     } catch (HttpException $e) {
       throw $e;
     }
   }
+
+/*=====================  GET BY ORDER ID ====================================*/
+  #[Route("GET", "/orderItems/byOrder/:orderId",
+  middlewares: [AuthMiddleware::class])]
+public function getItemsByOrderId() {
+    $orderId = intval($this->params['orderId']);
+    if ($orderId <= 0) {
+        throw new HttpException("orderId invalide", 400);
+    }
+    return $this->orderItem->getByOrderId($orderId);
+}
+
 
   /*========================= DELETE ========================================*/
 

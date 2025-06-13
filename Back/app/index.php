@@ -14,8 +14,7 @@ JWT::initialize();
 
 $allowedOrigins = [
     'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://192.168.1.26:5173'
+    'http://127.0.0.1:5173'
 ];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
 if (in_array($origin, $allowedOrigins)) {

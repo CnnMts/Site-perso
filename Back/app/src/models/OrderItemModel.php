@@ -10,18 +10,24 @@ class OrderItemModel extends SqlConnect {
 
   /*========================= ADD ===========================================*/
 
-  public function add(array $data) {
+ public function add(array $data) {
     try {
-        if (empty($data['product_id']) || empty($data['order_id']) || empty($data['name'])) {
-            throw new Exception("Champs requis manquants.");
+        $requiredFields = ['product_id', 'order_id', 'name', 'picture'];
+
+        foreach ($requiredFields as $field) {
+            if (!isset($data[$field]) || $data[$field] === '') {
+                throw new Exception("Champ requis manquant : $field");
+            }
         }
-        $sqlInsert = "INSERT INTO order_items (product_id, order_id, name) 
-                      VALUES (:product_id, :order_id, :name)";
+
+        $sqlInsert = "INSERT INTO order_items (product_id, order_id, name, picture) 
+                      VALUES (:product_id, :order_id, :name, :picture)";
         $stmtInsert = $this->db->prepare($sqlInsert);
         $stmtInsert->execute([
             ':product_id' => $data['product_id'],
             ':order_id' => $data['order_id'],
             ':name' => $data['name'],
+            ':picture' => $data['picture'],
         ]);
         $sqlTotal = "
             SELECT SUM(p.sale_price) AS total
@@ -33,6 +39,7 @@ class OrderItemModel extends SqlConnect {
         $stmtTotal->execute([':order_id' => $data['order_id']]);
         $result = $stmtTotal->fetch();
         $total = $result['total'] ?? 0;
+
         $sqlUpdateOrder = "UPDATE orders SET total_price = :total WHERE id = :order_id";
         $stmtUpdate = $this->db->prepare($sqlUpdateOrder);
         $stmtUpdate->execute([
@@ -46,8 +53,7 @@ class OrderItemModel extends SqlConnect {
     } catch (Exception $e) {
         throw new Exception("Erreur : " . $e->getMessage());
     }
-  }
-
+}
 
   /*========================= GET BY ID  ====================================*/
 
@@ -58,6 +64,16 @@ class OrderItemModel extends SqlConnect {
     return $req->rowCount() > 0 ? 
       $req->fetch(PDO::FETCH_ASSOC) : new stdClass();
   }
+
+
+ /*============================= GET BY ORDER ID ============================*/
+  public function getByOrderId(int $orderId): array {
+    $sql = "SELECT * FROM {$this->table} WHERE order_id = :order_id";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':order_id' => $orderId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
   /*========================= GET ALL =======================================*/
 

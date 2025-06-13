@@ -1,47 +1,81 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Mon Panier</h1>
+  <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h1
+      class="text-3xl font-extrabold mb-6 border-b-4 border-violet-400 pb-2 text-gray-900 text-center"
+    >
+      Mon Panier
+    </h1>
 
-    <div v-if="loading" class="text-gray-500">Chargement du panier...</div>
-
-    <div v-else-if="!cart">
-      <p class="text-red-500">Aucun panier actif trouvé.</p>
+    <div v-if="loading" class="text-gray-500 italic text-lg text-center">
+      Chargement du panier...
     </div>
 
-    <div v-else-if="cart.status_id === 3">
-      <div class="text-red-600">
-        <p>Vous n'avez plus de commande en cours</p>
-      </div>
+    <div v-else-if="!cart" class="text-red-600 font-semibold text-lg text-center">
+      Aucun panier actif trouvé.
+    </div>
+
+    <div v-else-if="cart.status_id === 3" class="text-red-700 font-semibold text-lg text-center">
+      Vous n'avez plus de commande en cours
     </div>
 
     <div v-else>
       <ul class="space-y-4">
         <li
-          v-for="item in cart.items"
-          :key="item.item_id"
-          class="border p-4 rounded-lg shadow"
+          v-for="(group, index) in groupedItems"
+          :key="index"
+          class="border border-gray-300 rounded-lg p-4 shadow hover:shadow-lg transition-shadow duration-200"
         >
-          <div class="flex justify-between">
-            <div>
-              <p class="font-semibold">{{ item.product_name }}</p>
-              <p class="text-sm text-gray-600">ID produit : {{ item.product_id }}</p>
-            </div>
-            <div class="text-right">
-              <p class="text-lg font-bold">
-                {{ (Number(item.sale_price) || 0).toFixed(2) }} €
+          <div class="flex flex-col sm:flex-row justify-between items-center">
+            <div class="w-full sm:w-3/4">
+              <p
+                @click="toggleDetail(group.name)"
+                class="font-semibold text-lg text-gray-800 hover:text-yellow-600 break-words cursor-pointer select-none"
+              >
+                {{ group.name }}<span v-if="group.count > 1"> x{{ group.count }}</span>
               </p>
+              <p class="text-sm text-gray-500 mt-1">ID produit : {{ group.product_id }}</p>
+            </div>
+            <div
+              class="mt-3 sm:mt-0 text-yellow-700 font-bold text-xl sm:text-right w-full sm:w-1/4"
+            >
+              {{ group.totalPrice.toFixed(2) }} €
             </div>
           </div>
+
+          <transition name="fade">
+            <div v-show="expanded[group.name]" class="mt-4 border-t border-gray-200 pt-3">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div
+                  v-for="item in group.items"
+                  :key="item.item_id"
+                  class="border rounded-md overflow-hidden shadow-sm"
+                >
+                  <img
+                    v-if="item.image_url"
+                    :src="formatBase64Image(item.image_url)"
+                    alt="Photo produit"
+                    class="w-full h-24 object-cover"
+                  />
+                  <div class="p-2 text-center text-sm text-gray-700">
+                    Prix : {{ (Number(item.sale_price) || 0).toFixed(2) }} €
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
         </li>
       </ul>
 
-      <div class="mt-6 border-t pt-4 text-right">
-        <p class="text-xl font-semibold">
+      <div
+        class="mt-8 border-t border-gray-300 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4"
+      >
+        <p class="text-2xl font-extrabold text-gray-900">
           Total : {{ (Number(cart.total_price) || 0).toFixed(2) }} €
         </p>
         <button
           @click="changeStatus"
-          class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-700 hover:to-pink-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-300 w-full sm:w-auto"
+
         >
           Payer
         </button>
@@ -52,6 +86,7 @@
 
 <script>
 import orderModel from '../models/orderModel';
+import Footer from './Footer.vue';
 
 export default {
   data() {
@@ -59,9 +94,45 @@ export default {
       cart: null,
       loading: true,
       userId: null,
+      expanded: {},
     };
   },
+  computed: {
+    groupedItems() {
+      if (!this.cart || !this.cart.items) return [];
+
+      const map = new Map();
+
+      this.cart.items.forEach((item) => {
+        const key = item.product_name;
+        if (map.has(key)) {
+          const group = map.get(key);
+          group.count += 1;
+          group.totalPrice += Number(item.sale_price) || 0;
+          group.items.push(item);
+        } else {
+          map.set(key, {
+            name: item.product_name,
+            product_id: item.product_id,
+            count: 1,
+            totalPrice: Number(item.sale_price) || 0,
+            items: [item],
+          });
+        }
+      });
+
+      return Array.from(map.values());
+    },
+  },
   methods: {
+    formatBase64Image(image) {
+      if (!image) return null;
+      if (image.startsWith('data:image')) return image;
+      return `data:image/png;base64,${image}`;
+    },
+    toggleDetail(productName) {
+      this.expanded = { ...this.expanded, [productName]: !this.expanded[productName] };
+    },
     getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -72,7 +143,6 @@ export default {
       try {
         const token = this.getCookie('pmaUser');
         if (!token) {
-          console.error('Token missing in cookie pmaUser');
           this.loading = false;
           return;
         }
@@ -83,15 +153,13 @@ export default {
         this.userId = payloadObj.id;
 
         if (!this.userId) {
-          console.error('Token ID is missing in the token payload');
           this.loading = false;
           return;
         }
 
         const data = await orderModel.getCartClient(this.userId);
         this.cart = data;
-      } catch (err) {
-        console.error('Erreur récupération panier :', err);
+      } catch {
         this.cart = null;
       } finally {
         this.loading = false;
@@ -116,8 +184,7 @@ export default {
         alert('Merci pour votre achat.');
         await this.fetchCart();
         this.$router.push('/');
-      } catch (error) {
-        console.error(error);
+      } catch {
         alert('Erreur lors de la mise à jour du statut.');
       }
     },
@@ -127,3 +194,22 @@ export default {
   },
 };
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  max-height: 500px;
+  overflow: hidden;
+}
+</style>

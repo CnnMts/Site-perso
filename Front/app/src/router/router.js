@@ -14,12 +14,13 @@ import DashBoardUsers from '../views/Users.vue';
 import DashBoardProduct from '../views/DashProduct.vue';
 import Cart from '../views/Cart.vue';
 import Account from '../views/AccountView.vue';
+import Error404 from '../views/Error404.vue';
 
 const admin = 1;
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
-  { path: '/user', name: 'UserView', component: UserView },
+  { path: '/user', name: 'UserView', component: UserView, meta: { requiresAdmin: true } },
   { path: '/register', name: 'Register', component: RegisterView },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/product/:id', name: 'product-detail', component: ProductDetail },
@@ -27,10 +28,11 @@ const routes = [
   { path: '/render', name: 'render', component: Render3d },
   { path: '/contact', name: 'contact', component: Contact },
   { path: '/cart', name: 'cart', component: Cart },
-   { path: '/account', name: 'account', component: Account },
+  { path: '/account', name: 'account', component: Account },
   { path: '/dash', name: 'dash', component: Dash, meta: { requiresAdmin: true } },
   { path: '/dash/users', name: 'dashUsers', component: DashBoardUsers, meta: { requiresAdmin: true } },
-  { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true } }
+  { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true } },
+  { path: '/:pathMatch(.*)*', name: 'Error404', component: Error404 }
 ];
 
 const router = createRouter({
@@ -44,6 +46,7 @@ function getCookie(name) {
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
 }
+
 router.beforeEach((to, from, next) => {
   const token = getCookie('pmaUser');
 
@@ -57,11 +60,10 @@ router.beforeEach((to, from, next) => {
       const decoded = jwtDecode(token);
       const userRole = decoded.role;
 
-      if (userRole === 1 || userRole === 'admin') {
+      if (userRole === admin || userRole === 'admin') {
         return next();
       } else {
-        alert("Accès réservé aux administrateurs.");
-        return next('/');
+        return next('/404-page-not-found'); 
       }
     } catch (err) {
       console.error("Token invalide :", err);
@@ -72,6 +74,5 @@ router.beforeEach((to, from, next) => {
 
   return next();
 });
-
 
 export default router;
