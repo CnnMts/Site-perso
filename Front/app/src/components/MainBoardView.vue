@@ -1,63 +1,86 @@
 <template>
-  <div class="container-mid">
-    <h1 class="title">Tableau de bord</h1>
+  <div class="flex-1 p-8 bg-gradient-to-b from-purple-50 via-pink-50 to-white overflow-y-auto">
+  <h1 class="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 bg-clip-text text-transparent">
+  Tableau de bord
+  </h1>
 
-    <div class="orders">
-      <div
-        v-for="order in orders"
-        :key="order.id"
-        class="order-card"
-        @click="openModal(order)"
-      >
-      
-        <div class="info-section">
-          <p><strong>Commande #{{ order.id }}</strong></p>
-          <p>Client : {{ order.user_name }} {{ order.user_firstname }}</p>
-          <p>Date : {{ formatDate(order.updated_at) }}</p>
-          <p>Total : {{ order.total_price }} €</p>
-        </div>
-      </div>
-    </div>
 
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content">
-        <h2>Détail de la commande #{{ selectedOrder.id }}</h2>
-        <p><strong>Client :</strong> {{ selectedOrder.user_name }} {{ selectedOrder.user_firstname }}</p>
-        <p><strong>Date :</strong> {{ formatDate(selectedOrder.updated_at) }}</p>
-        <p><strong>Total :</strong> {{ selectedOrder.total_price }} €</p>
-        <h3>Articles associés :</h3>
-        <h3>Articles associés :</h3>
-<div class="items-gallery">
-  <div v-for="item in orderItems" :key="item.name" class="item-card">
-    <img
-      v-if="item.picture"
-      :src="item.picture"
-      :alt="`Image de ${item.name}`"
-      class="item-image"
-    />
-    <div class="item-info">
-      <p><strong>{{ item.name }}</strong></p>
-      <p>Quantité : {{ item.quantity }}</p>
-      <p>Prix : {{ item.price ?? 'N/A' }} €</p>
-      <a
-        v-if="item.picture"
-        :href="item.picture"
-        :download="`item_${item.name}.png`"
-        class="download-button"
-        @click.stop
-      >Télécharger l'image</a>
+  <div class="flex flex-col gap-6">
+  <div
+    v-for="order in orders"
+    :key="order.id"
+    class="rounded-xl p-6 shadow-md flex cursor-pointer gap-6
+       border border-transparent
+       hover:shadow-xl hover:-translate-y-1 transition-transform duration-200"
+    @click="openModal(order)"
+  >
+    <div class="flex flex-col flex-1 gap-1 text-purple-900">
+      <p class="font-semibold text-lg bg-clip-text text-transparent
+                bg-gradient-to-r from-purple-600 via-pink-600 to-pink-500">
+        Commande #{{ order.id }}
+      </p>
+      <p>Client : {{ order.user_name }} {{ order.user_firstname }}</p>
+      <p>Date : {{ formatDate(order.updated_at) }}</p>
+      <p>Total : {{ order.total_price }} €</p>
     </div>
   </div>
 </div>
 
 
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50"
+      @click.self="closeModal"
+    >
+      <div
+        class="bg-white rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto text-center"
+      >
+        <h2 class="text-2xl font-bold mb-4">Détail de la commande #{{ selectedOrder.id }}</h2>
+        <p class="mb-1"><strong>Client :</strong> {{ selectedOrder.user_name }} {{ selectedOrder.user_firstname }}</p>
+        <p class="mb-1"><strong>Date :</strong> {{ formatDate(selectedOrder.updated_at) }}</p>
+        <p class="mb-6"><strong>Total :</strong> {{ selectedOrder.total_price }} €</p>
+
+        <h3 class="text-xl font-semibold mb-4">Articles associés :</h3>
+        <div
+          class="flex flex-wrap justify-center gap-6 mb-6"
+        >
+          <div
+            v-for="item in orderItems"
+            :key="item.name"
+            class="bg-purple-100 rounded-xl p-4 w-36 flex flex-col items-center shadow"
+          >
+            <img
+              v-if="item.picture"
+              :src="item.picture"
+              :alt="`Image de ${item.name}`"
+              class="w-28 h-28 object-cover rounded-lg border border-purple-300 mb-3"
+            />
+            <div class="text-gray-800 text-sm text-center">
+              <p class="font-semibold">{{ item.name }}</p>
+              <p>Quantité : {{ item.quantity }}</p>
+              <a
+                v-if="item.picture"
+                :href="item.picture"
+                :download="`item_${item.name}.png`"
+                class="inline-block mt-2 px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                @click.stop
+              >Télécharger l'image</a>
+            </div>
+          </div>
+        </div>
+
         <img
           v-if="selectedOrder.picture"
           :src="selectedOrder.picture"
           alt="Image commande"
-          class="modal-image"
+          class="w-full rounded-lg mb-6 object-contain max-h-60 mx-auto"
         />
-        <button @click="closeModal">Fermer</button>
+        <button
+          @click="closeModal"
+          class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition"
+        >
+          Fermer
+        </button>
       </div>
     </div>
   </div>
@@ -149,7 +172,6 @@ export default {
       }
     },
 
-
     closeModal() {
       this.selectedOrder = null;
       this.orderItems = [];
@@ -158,179 +180,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.container-mid {
-  flex: 1;
-  padding: 30px;
-  background-color: #f9fafb;
-  overflow-y: auto;
-}
-
-.title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #111827;
-}
-
-.orders {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.order-card {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.5);
-  gap: 20px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-}
-
-.order-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-}
-
-.image-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 180px;
-  gap: 10px;
-}
-
-.preview-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-}
-
-.preview-canvas {
-  width: 150px;
-  height: 150px;
-  background-color: #e5e7eb;
-  border-radius: 8px;
-}
-
-.download-button {
-  display: inline-block;
-  padding: 6px 12px;
-  background-color: #2563eb;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.download-button:hover {
-  background-color: #1e40af;
-}
-
-.info-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 100%;
-  text-align: center;
-}
-
-.modal-image {
-  width: 100%;
-  margin-top: 20px;
-  border-radius: 8px;
-}
-
-.modal-content button {
-  margin-top: 20px;
-  background-color: #ef4444;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.modal-content button:hover {
-  background-color: #b91c1c;
-}
-
-.items-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 15px;
-}
-
-.item-card {
-  background: #f3f4f6;
-  border-radius: 12px;
-  padding: 12px;
-  width: 140px;
-  text-align: center;
-  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.item-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-}
-
-.download-button {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 6px 10px;
-  background-color: #2563eb;
-  color: white;
-  border-radius: 6px;
-  font-size: 13px;
-  text-decoration: none;
-  user-select: none;
-  transition: background-color 0.2s;
-}
-
-.download-button:hover {
-  background-color: #1e40af;
-  cursor: pointer;
-}
-
-</style>

@@ -14,7 +14,7 @@
       Aucun panier actif trouvé.
     </div>
 
-    <div v-else-if="cart.status_id === 3" class="text-red-700 font-semibold text-lg text-center">
+    <div v-else-if="cart.status_id === 3" class="font-semibold text-lg text-center">
       Vous n'avez plus de commande en cours
     </div>
 
@@ -29,14 +29,16 @@
             <div class="w-full sm:w-3/4">
               <p
                 @click="toggleDetail(group.name)"
-                class="font-semibold text-lg text-gray-800 hover:text-yellow-600 break-words cursor-pointer select-none"
+              class="font-semibold text-lg text-gray-800 hover:text-transparent hover:bg-clip-text 
+                      hover:bg-gradient-to-r hover:from-pink-500 hover:to-violet-600 
+                      active:from-pink-600 active:to-violet-700 
+                      break-words cursor-pointer select-none transition-all duration-300"
               >
                 {{ group.name }}<span v-if="group.count > 1"> x{{ group.count }}</span>
               </p>
-              <p class="text-sm text-gray-500 mt-1">ID produit : {{ group.product_id }}</p>
             </div>
             <div
-              class="mt-3 sm:mt-0 text-yellow-700 font-bold text-xl sm:text-right w-full sm:w-1/4"
+              class="mt-3 sm:mt-0 w-full sm:w-1/4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-600  font-bold text-xl sm:text-right"
             >
               {{ group.totalPrice.toFixed(2) }} €
             </div>
@@ -51,14 +53,11 @@
                   class="border rounded-md overflow-hidden shadow-sm"
                 >
                   <img
-                    v-if="item.image_url"
-                    :src="formatBase64Image(item.image_url)"
+                    v-if="item.picture"
+                    :src="formatBase64Image(item.picture)"
                     alt="Photo produit"
                     class="w-full h-24 object-cover"
                   />
-                  <div class="p-2 text-center text-sm text-gray-700">
-                    Prix : {{ (Number(item.sale_price) || 0).toFixed(2) }} €
-                  </div>
                 </div>
               </div>
             </div>
@@ -75,7 +74,6 @@
         <button
           @click="changeStatus"
           class="bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-700 hover:to-pink-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-300 w-full sm:w-auto"
-
         >
           Payer
         </button>
@@ -102,6 +100,7 @@ export default {
       if (!this.cart || !this.cart.items) return [];
 
       const map = new Map();
+      console.log(this.cart.items)
 
       this.cart.items.forEach((item) => {
         const key = item.product_name;
@@ -114,13 +113,13 @@ export default {
           map.set(key, {
             name: item.product_name,
             product_id: item.product_id,
+            image: item.picture,
             count: 1,
             totalPrice: Number(item.sale_price) || 0,
             items: [item],
           });
         }
       });
-
       return Array.from(map.values());
     },
   },

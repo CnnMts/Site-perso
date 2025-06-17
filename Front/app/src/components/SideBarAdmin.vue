@@ -1,13 +1,26 @@
 <template>
-  <div class="container-left">
-    <div class="logo">Admin</div>
-    <nav class="nav-links">
-      <a href="/dash" class="nav-item">Dashboard</a>
-      <a href="/dash/users" class="nav-item">Utilisateurs</a>
-      <a href="/dash/product" class="nav-item">Produits</a>
-     <a href="#" class="nav-item" @click.prevent="logout">Déconnexion</a>
-
-
+  <div class="w-60 h-screen flex flex-col p-5 shadow-md
+              bg-gradient-to-b from-purple-700 to-pink-500 text-white">
+    <div class="text-2xl font-bold mb-10 text-center drop-shadow-md">
+      Admin
+    </div>
+    <nav class="flex flex-col gap-4">
+      <a href="/dash" class="rounded-lg px-4 py-2 transition
+                          hover:bg-pink-400 hover:shadow-lg">
+        Dashboard
+      </a>
+      <a href="/dash/users" class="rounded-lg px-4 py-2 transition
+                                hover:bg-pink-400 hover:shadow-lg">
+        Utilisateurs
+      </a>
+      <a href="/dash/product" class="rounded-lg px-4 py-2 transition
+                                 hover:bg-pink-400 hover:shadow-lg">
+        Produits
+      </a>
+      <a href="#" @click.prevent="logout" class="rounded-lg px-4 py-2 transition
+                                               hover:bg-pink-400 hover:shadow-lg cursor-pointer">
+        Déconnexion
+      </a>
     </nav>
   </div>
 </template>
@@ -17,7 +30,7 @@ export default {
   methods: {
     async logout() {
       try {
-        fetch("http://127.0.0.1:9999/auth/logout", {
+        await fetch("http://127.0.0.1:9999/auth/logout", {
           method: "POST",
           credentials: "include"
         });
@@ -30,42 +43,3 @@ export default {
   }
 }
 </script>
-
-
-<style scoped>
-.container-left {
-  width: 240px;
-  background-color: #1f2937; 
-  color: white;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 40px;
-  text-align: center;
-}
-
-.nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.nav-item {
-  color: white;
-  text-decoration: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  transition: background-color 0.3s;
-}
-
-.nav-item:hover {
-  background-color: #374151; 
-}
-</style>

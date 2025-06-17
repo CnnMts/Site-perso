@@ -76,20 +76,14 @@ class User extends Controller {
 
   /*========================= PATCH =========================================*/
 
-  #[Route("PATCH", "/user/:id",
-    middlewares: [AuthMiddleware::class, 
-    [RoleMiddleware::class, Roles::ROLE_ADMIN]])]
+  #[Route("PATCH", "/user/:id")]
   public function updateUser() {
     try {
       $id = intval($this->params['id']);
       $data = $this->body;
-
-      # Check if the data is empty
       if (empty($data)) {
         throw new HttpException("Missing parameters for the update.", 400);
       }
-
-      # Check for missing fields
       $missingFields = array_diff(
         $this->user->authorized_fields_to_update, array_keys($data));
       if (!empty($missingFields)) {
@@ -98,13 +92,35 @@ class User extends Controller {
       }
 
       $this->user->update($data, intval($id));
-
-      # Let's return the updated user
       return $this->user->get($id);
     } catch (HttpException $e) {
       throw $e;
     }
   }
+
+/*========================= PATCH DELIVERY ==================================*/
+#[Route("PATCH", "/userDelivery/:id")]
+public function updateUserDelivery() {
+  try {
+    $id = intval($this->params['id']);
+    $data = $this->body;
+
+    if (empty($data)) {
+      throw new HttpException("Missing parameters for the update.", 400);
+    }
+    $allowedFields = ['zip_code', 'city', 'address'];
+    $invalidFields = array_diff(array_keys($data), $allowedFields);
+    if (!empty($invalidFields)) {
+      throw new HttpException("Invalid fields: " . implode(", ", $invalidFields), 
+      400);
+    }
+    $this->user->updateDelivery($data, $id);
+    return $this->user->get($id);
+
+  } catch (HttpException $e) {
+    throw $e;
+  }
+}
 
   /*========================= DELETE ========================================*/
 

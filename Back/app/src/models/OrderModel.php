@@ -224,42 +224,48 @@ public function getCartByUserId(int $userId, ?int $statusId = null) {
     $orderId = $orderRow['id'];
     $query = "
         SELECT 
-            o.id AS order_id,
-            o.total_price,
-            o.status_id,
-            o.updated_at,
-            oi.id AS item_id,
-            oi.product_id,
-            p.name AS product_name,
-            p.sale_price
-        FROM orders o
-        LEFT JOIN order_items oi ON o.id = oi.order_id
-        LEFT JOIN product p ON oi.product_id = p.id
-        WHERE o.id = :order_id
+            orders.id,
+            orders.total_price,
+            orders.status_id,
+            orders.updated_at,
+            order_items.id,
+            order_items.product_id,
+            order_items.picture,
+            product.name,
+            product.sale_price
+        FROM orders
+        LEFT JOIN order_items ON orders.id = order_items.order_id
+        LEFT JOIN product ON order_items.product_id = product.id
+        WHERE orders.id = :order_id
     ";
     $req = $this->db->prepare($query);
     $req->execute([':order_id' => $orderId]);
     $results = $req->fetchAll(PDO::FETCH_ASSOC);
+
     if (empty($results)) {
         return null;
     }
+
     $cart = [
-        'order_id' => $results[0]['order_id'],
+        'order_id' => $results[0]['id'],
         'total_price' => $results[0]['total_price'],
         'status_id' => $results[0]['status_id'],
         'updated_at' => $results[0]['updated_at'],
         'items' => []
     ];
+
     foreach ($results as $row) {
-        if ($row['item_id']) {
+        if ($row['id']) {
             $cart['items'][] = [
-                'item_id' => $row['item_id'],
+                'item_id' => $row['id'],
                 'product_id' => $row['product_id'],
-                'product_name' => $row['product_name'],
-                'sale_price' => $row['sale_price']
+                'product_name' => $row['name'],
+                'sale_price' => $row['sale_price'],
+                'picture' => $row['picture'],
             ];
         }
     }
+
     return $cart;
 }
 

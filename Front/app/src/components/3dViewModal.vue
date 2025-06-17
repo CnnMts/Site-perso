@@ -52,7 +52,7 @@ export default {
       modelReady: false,
       rotate: true,
       controls: null,
-      productId: 1,
+      productId: null,
       productName: 'Mug personnalisé',
       price: 20,
       quantity: 1,
@@ -209,6 +209,10 @@ export default {
     console.error("Aucune image disponible pour l'ajout au panier.");
     return;
   }
+  const url = window.location.pathname; 
+  const parts = url.split('/');         
+  this.productId = parts[2];                
+   
   try {
     const orderData = {
       user_id: this.userId,
@@ -216,8 +220,6 @@ export default {
       total_price: this.price,
       payment_method_id: this.paymentMethodId,
     };
-
-    console.log("Données de la commande envoyées:", orderData); // Vérifiez les données envoyées
 
     const orderResponse = await orderModel.addOrder(orderData);
     console.log("Réponse création commande:", orderResponse);

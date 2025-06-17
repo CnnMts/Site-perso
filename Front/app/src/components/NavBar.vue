@@ -83,7 +83,8 @@ onMounted(() => {
             ☰
           </button>
         </div>
-        <div class="hidden md:flex flex-grow justify-center px-4 flex-col items-center">
+
+      <div class="hidden md:flex flex-grow justify-center px-4 items-center ml-20">
           <div class="flex w-[400px] bg-white rounded-full shadow-md overflow-hidden focus-within:ring-2 focus-within:ring-pink-400">
             <input
               type="text"
@@ -94,20 +95,21 @@ onMounted(() => {
             />
             <button
               @click="handleSearch"
-              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors"
+              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors flex items-center justify-center"
             >
-              🔍
+              <img src="../assets/loupe.svg" alt="Rechercher" class="h-5 w-5" />
             </button>
           </div>
-          <div class="text-red-500 text-sm mt-1 min-h-[1.25rem]">
+          <div class="text-sm mt-1 min-h-[1.25rem] ml-4 text-white">
             {{ searchError }}
           </div>
         </div>
+
         <div class="hidden md:flex items-center gap-6 text-white text-lg">
-          <a href="/contact" title="Support">
+          <a href="/contact" title="Support" class="flex items-center justify-center">
             <img src="../assets/navIcon/support.png" alt="Support" class="h-7 w-7" />
           </a>
-          <a href="/cart" title="Panier">
+          <a href="/cart" title="Panier" class="flex items-center justify-center">
             <img src="../assets/navIcon/shopping-cart.png" alt="Panier" class="h-7 w-7" />
           </a>
           <template v-if="!state.isLoggedIn">
@@ -122,12 +124,13 @@ onMounted(() => {
             </a>
           </template>
           <template v-else>
-            <a href="/account" title="Mon compte">
+            <a href="/account" title="Mon compte" class="flex items-center justify-center">
               <img src="../assets/navIcon/compte.png" alt="Compte" class="h-7 w-7" />
             </a>
           </template>
         </div>
       </div>
+
       <div v-if="isMobileMenuOpen" class="md:hidden bg-white text-gray-800 px-4 py-4 space-y-4">
         <div class="flex justify-around items-center text-lg">
           <a href="/contact">
@@ -158,7 +161,7 @@ onMounted(() => {
             />
             <button
               @click="handleSearch"
-              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors"
+              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors flex items-center justify-center"
             >
               🔍
             </button>
@@ -171,3 +174,4 @@ onMounted(() => {
     </div>
   </nav>
 </template>
+

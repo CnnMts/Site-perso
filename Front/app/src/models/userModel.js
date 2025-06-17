@@ -94,5 +94,48 @@ export default {
       console.error("Erreur lors de la suppression de l'utilisateur", error);
       return null;
     }
+  },
+
+  async updateUserById(id, payload) {
+    try {
+      const response = await fetch(`${BASE_URL}/user/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload), 
+      });
+
+      if (!response.ok) {
+        throw new Error('Réponse du serveur non valide');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+      return null;
+    }
+  },
+
+  async updateUserDelivery(id, payload) {
+    try {
+      const response = await fetch(`${BASE_URL}/userDelivery/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload), 
+      });
+
+      if (!response.ok) {
+        throw new Error('Réponse du serveur non valide');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+      return null;
+    }
   }
-};
+
+  };

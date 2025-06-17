@@ -1,33 +1,42 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Mon App</title>
-    <link rel="icon" href="/favicon.ico" />
+  <title>Mon App</title>
+  <link rel="icon" href="/favicon.ico" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#1E3A8A',
-            },
-          },
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E3A8A',
+          }
         },
-        
-      }
-    </script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
-  </head>
+      },
+    }
+  </script>
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+    }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+
   <body class="bg-gray-100 text-gray-800 min-h-screen margin-0">
     <div id="app" class="w-full h-screen"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>

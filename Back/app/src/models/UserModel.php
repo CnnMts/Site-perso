@@ -10,7 +10,7 @@ use App\Utils\{HttpException};
 class UserModel extends SqlConnect {
   private $table = "user";
   public $authorized_fields_to_update = [
-    'role_id', 'username', 'identification_code'];
+    'name', 'firstname', 'email'];
 
   /*========================= ADD ===========================================*/
 
@@ -139,6 +139,28 @@ public function findByName(string $name): ?array {
     
     return $this->get($id);
   }
+
+  /*========================== UPDATE DELIEVERY ======++++++=================*/
+  public function updateDelivery(array $data, int $id) {
+      $allowedKeys = ['zip_code', 'city', 'address'];
+      $request = "UPDATE $this->table SET ";
+      $params = [];
+      $fields = [];
+      foreach ($data as $key => $value) {
+          if (in_array($key, $allowedKeys)) {
+              $fields[] = "$key = :$key";
+              $params[":$key"] = $value;
+          }
+      }
+      if (empty($fields)) {
+        throw new Exception("Aucun champ valide à mettre à jour.");
+      }
+      $params[':id'] = $id;
+      $query = $request . implode(", ", $fields) . " WHERE id = :id";
+      $req = $this->db->prepare($query);
+      $req->execute($params);
+      return $this->get($id);
+}
   
   /*========================= DELETE ========================================*/
 

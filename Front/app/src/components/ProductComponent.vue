@@ -1,89 +1,87 @@
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Gestion des Produits</h1>
+    <h1 class="text-2xl font-bold mb-4 text-purple-700">Gestion des Produits</h1>
 
     <button
       @click="openModal"
-      class="bg-green-600 text-white px-4 py-2 rounded mb-4"
+      class="bg-gradient-to-r from-violet-600 via-purple-700 to-pink-500 text-white px-4 py-2 rounded mb-4 hover:from-pink-500 hover:to-violet-600 transition-colors"
     >
        Ajouter un produit
     </button>
 
     <div
       v-if="showModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center
-             justify-center z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div
         class="bg-white p-6 rounded shadow-md w-full max-w-md relative"
       >
         <button
           @click="closeModal"
-          class="absolute top-2 right-2 text-gray-500 hover:text-black"
+          class="absolute top-2 right-2 text-purple-500 hover:text-pink-600"
+          aria-label="Fermer"
         >
-          
+          ✕
         </button>
 
-        <h2 class="text-xl font-semibold mb-4">
+        <h2 class="text-xl font-semibold mb-4 text-purple-800">
           {{ form.id ? 'Modifier' : 'Ajouter' }} un produit
         </h2>
 
         <form @submit.prevent="handleSubmit" class="space-y-3">
           <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 text-violet-700">
               Nom du produit
             </label>
             <input
               v-model="form.name"
               placeholder="Ex : Tasse Blanche"
-              class="border p-2 w-full"
+              class="border border-violet-300 p-2 w-full rounded focus:ring-2 focus:ring-pink-400 focus:border-pink-500"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Stock</label>
+            <label class="block text-sm font-medium mb-1 text-violet-700">Stock</label>
             <input
               v-model.number="form.stock"
               type="number"
               min="0"
               placeholder="Ex : 20"
-              class="border p-2 w-full"
+              class="border border-violet-300 p-2 w-full rounded focus:ring-2 focus:ring-pink-400 focus:border-pink-500"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 text-violet-700">
               Prix de vente (€)
             </label>
             <div class="relative">
               <input
                 v-model.number="form.sale_price"
                 type="number"
-                step="0.01"
-                class="border p-2 w-full pr-10"
+                class="border border-violet-300 p-2 w-full pr-10 rounded focus:ring-2 focus:ring-pink-400 focus:border-pink-500"
                 placeholder="Ex : 12.00"
               />
-              <span class="absolute right-3 top-2.5 text-gray-500">
+              <span class="absolute right-3 top-2.5 text-pink-400 font-semibold">
                 €
               </span>
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">
+            <label class="block text-sm font-medium mb-1 text-violet-700">
               Prix d'achat (€)
             </label>
             <div class="relative">
               <input
                 v-model.number="form.purchase_price"
                 type="number"
-                step="0.01"
-                class="border p-2 w-full pr-10"
+                class="border border-violet-300 p-2 w-full pr-10 rounded focus:ring-2 focus:ring-pink-400 focus:border-pink-500"
                 placeholder="Ex : 1.50"
               />
-              <span class="absolute right-3 top-2.5 text-gray-500">
+              <span class="absolute right-3 top-2.5 text-pink-400 font-semibold">
                 €
               </span>
             </div>
@@ -91,7 +89,7 @@
 
           <button
             type="submit"
-            class="bg-blue-500 text-white px-4 py-2 rounded w-full"
+            class="bg-gradient-to-r from-violet-600 via-purple-700 to-pink-500 text-white px-4 py-2 rounded w-full hover:from-pink-500 hover:to-violet-600 transition-colors"
           >
             {{ form.id ? 'Modifier' : 'Ajouter' }}
           </button>
@@ -103,24 +101,24 @@
       <li
         v-for="product in products"
         :key="product.id"
-        class="border p-3 rounded flex justify-between items-center bg-white"
+        class="border border-violet-300 p-3 rounded flex justify-between items-center bg-white shadow-sm hover:shadow-md transition-shadow"
       >
-        <div>
+        <div class="text-purple-700">
           <strong>{{ product.name }}</strong><br />
           Stock : {{ product.stock }} |
           Vente : {{ product.sale_price }}€ |
           Achat : {{ product.purchase_price }}€
         </div>
-        <div class="space-x-2">
+        <div class="space-x-4">
           <button
             @click="fillForm(product)"
-            class="text-violet-600 hover:text-yellow-800"
+            class="text-violet-600 hover:text-pink-600 font-semibold transition-colors"
           >
-          Edit
+            Edit
           </button>
           <button
             @click="deleteProduct(product.id)"
-            class="text-red-600 hover:text-red-800"
+            class="text-red-600 hover:text-red-800 font-semibold transition-colors"
           >
             Delete
           </button>
@@ -129,6 +127,7 @@
     </ul>
   </div>
 </template>
+
 
 <script>
 export default {
