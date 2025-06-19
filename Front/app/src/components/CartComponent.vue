@@ -84,8 +84,7 @@
 
 <script>
 import orderModel from '../models/orderModel';
-import Footer from './Footer.vue';
-
+import Swal  from 'sweetalert2';
 export default {
   data() {
     return {
@@ -155,6 +154,7 @@ export default {
 
         const data = await orderModel.getCartClient(this.userId);
         this.cart = data;
+        console.log(this.cart)
       } catch {
         this.cart = null;
       } finally {
@@ -177,7 +177,11 @@ export default {
           return;
         }
         await orderModel.updateOrderStatus(orderId, 3);
-        alert('Merci pour votre achat.');
+        await Swal.fire({
+        icon: 'success',
+        title: 'Merci pour votre achat',
+        confirmButtonText: 'OK'
+      });
         await this.fetchCart();
         this.$router.push('/');
       } catch {

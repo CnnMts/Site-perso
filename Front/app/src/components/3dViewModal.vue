@@ -272,10 +272,11 @@ export default {
   } catch (error) {
     await Swal.fire({
       icon: 'error',
-      title: 'Connecté vous',
+      title: 'Connectez-vous',
       text: 'Il faut être connecté pour commander .',
       confirmButtonText: 'OK'
     });
+    this.$router.push('/login');
     console.error("Erreur ajout panier :", error);
   }
 }

@@ -202,7 +202,7 @@ class OrderModel extends SqlConnect {
 
 
 /*=========================== GET CART CLIENT ===============================*/
-public function getCartByUserId(int $userId, ?int $statusId = null) {
+  public function getCartByUserId(int $userId, ?int $statusId = null) {
     $latestOrderQuery = "
         SELECT id 
         FROM orders 
@@ -211,33 +211,38 @@ public function getCartByUserId(int $userId, ?int $statusId = null) {
         ORDER BY updated_at DESC 
         LIMIT 1
     ";
+
     $params = [':user_id' => $userId];
     if ($statusId !== null) {
         $params[':status_id'] = $statusId;
     }
+
     $req = $this->db->prepare($latestOrderQuery);
     $req->execute($params);
     $orderRow = $req->fetch(PDO::FETCH_ASSOC);
+
     if (!$orderRow) {
         return null;
     }
+
     $orderId = $orderRow['id'];
     $query = "
         SELECT 
-            orders.id,
+            orders.id AS order_id,
             orders.total_price,
             orders.status_id,
             orders.updated_at,
-            order_items.id,
+            order_items.id AS item_id,
             order_items.product_id,
             order_items.picture,
-            product.name,
+            product.name AS product_name,
             product.sale_price
         FROM orders
         LEFT JOIN order_items ON orders.id = order_items.order_id
         LEFT JOIN product ON order_items.product_id = product.id
         WHERE orders.id = :order_id
     ";
+
     $req = $this->db->prepare($query);
     $req->execute([':order_id' => $orderId]);
     $results = $req->fetchAll(PDO::FETCH_ASSOC);
@@ -245,9 +250,8 @@ public function getCartByUserId(int $userId, ?int $statusId = null) {
     if (empty($results)) {
         return null;
     }
-
     $cart = [
-        'order_id' => $results[0]['id'],
+        'order_id' => $results[0]['order_id'],
         'total_price' => $results[0]['total_price'],
         'status_id' => $results[0]['status_id'],
         'updated_at' => $results[0]['updated_at'],
@@ -255,11 +259,11 @@ public function getCartByUserId(int $userId, ?int $statusId = null) {
     ];
 
     foreach ($results as $row) {
-        if ($row['id']) {
+        if (!is_null($row['item_id'])) {
             $cart['items'][] = [
-                'item_id' => $row['id'],
+                'item_id' => $row['item_id'],
                 'product_id' => $row['product_id'],
-                'product_name' => $row['name'],
+                'product_name' => $row['product_name'],
                 'sale_price' => $row['sale_price'],
                 'picture' => $row['picture'],
             ];
@@ -268,6 +272,7 @@ public function getCartByUserId(int $userId, ?int $statusId = null) {
 
     return $cart;
 }
+
 
 
   /*========================= UPDATE ========================================*/

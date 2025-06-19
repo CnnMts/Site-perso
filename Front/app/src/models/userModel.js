@@ -1,5 +1,5 @@
 const BASE_URL = `http://${window.location.hostname}:9999`
-
+import Swal  from 'sweetalert2';
 export default {
   async getUsers() {
     try {
@@ -147,7 +147,11 @@ export default {
       if (!response.ok) {
         throw new Error(`Erreur serveur: ${response.status}`);
       }
-      alert("Vous êtes déconnecté");
+      await Swal.fire({
+      icon: 'success',
+      title: 'Déconnexion',
+      confirmButtonText: 'OK'
+    });
       window.location.href = "/login";
     } catch (error) {
       console.error("Erreur de déconnexion :", error);

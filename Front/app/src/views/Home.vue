@@ -20,7 +20,7 @@
       </div>
       <div
         v-else
-        class="text-center mt-24 text-gray-500 text-xl font-medium animate-pulse"
+        class="text-center mt-24 text-gray-500 text-xl font-medium animate-bounce"
       >
         Aucun produit disponible pour le moment.
       </div>

@@ -162,7 +162,7 @@ public function updateOrderStatus() {
             throw new HttpException("Missing parameters for the update.", 400);
         }
 
-        $existingOrder = $this->order->get($id);
+       $existingOrder = (array) $this->order->get($id);
         if (!$existingOrder) {
             throw new HttpException("Order not found.", 404);
         }
