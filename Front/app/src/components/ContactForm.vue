@@ -25,6 +25,7 @@
 
 <script>
 import ContactMessagesModel from "../models/contactMessagesModel";
+import Swal  from 'sweetalert2';
 
 export default {
   data() {
@@ -47,6 +48,13 @@ export default {
       try {
         await ContactMessagesModel.addContactMessage(payload);
         this.fields.forEach((field) => (field.value = ""));
+        await Swal.fire({
+        icon: 'success',
+        title: 'Message Envoyé',
+        text: 'Votre message a bien été pris en compte.',
+        confirmButtonText: 'OK'
+      });
+      this.$router.push('/');
       } catch (error) {
         console.error(error);
       }

@@ -17,6 +17,10 @@
                                  hover:bg-pink-400 hover:shadow-lg">
         Produits
       </a>
+       <a href="/dash/form" class="rounded-lg px-4 py-2 transition
+                                 hover:bg-pink-400 hover:shadow-lg">
+        Messages formulaires
+      </a>
       <a href="#" @click.prevent="logout" class="rounded-lg px-4 py-2 transition
                                                hover:bg-pink-400 hover:shadow-lg cursor-pointer">
         Déconnexion

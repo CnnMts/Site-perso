@@ -96,7 +96,7 @@ export default {
     updateCanvasSize(productId) {
       if (productId == 1) {
         this.productType = "mug";
-        this.canvasWidth = 850;
+        this.canvasWidth = 950;
         this.canvasHeight = 275;
       } else if (productId == 2) {
         this.productType = "tumbler";

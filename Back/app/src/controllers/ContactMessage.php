@@ -29,7 +29,7 @@ class ContactMessage extends Controller {
     return ['message' => 'Contact message successfully sent!'];
   }
 
-  #[Route("GET", "/contact", /*middlewares: [AuthMiddleware::class, [RoleMiddleware::class, Roles::ROLE_ADMIN]]*/)]
+  #[Route("GET", "/contact", middlewares: [AuthMiddleware::class, [RoleMiddleware::class, Roles::ROLE_ADMIN]])]
   public function getAllContactMessages() {
     return $this->contact->getAll();
   }

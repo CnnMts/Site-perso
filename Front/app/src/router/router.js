@@ -15,6 +15,7 @@ import DashBoardProduct from '../views/DashProduct.vue';
 import Cart from '../views/Cart.vue';
 import Account from '../views/AccountView.vue';
 import Error404 from '../views/Error404.vue';
+import DashContactForm from '../views/DashForm.vue'
 
 const admin = 1;
 
@@ -32,6 +33,7 @@ const routes = [
   { path: '/dash', name: 'dash', component: Dash, meta: { requiresAdmin: true } },
   { path: '/dash/users', name: 'dashUsers', component: DashBoardUsers, meta: { requiresAdmin: true } },
   { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true } },
+  { path: '/dash/form', name: 'dashContact', component: DashContactForm, meta: { requiresAdmin: true } },
   { path: '/:pathMatch(.*)*', name: 'Error404', component: Error404 }
 ];
 

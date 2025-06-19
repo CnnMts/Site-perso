@@ -13,6 +13,24 @@ const contactMessagesModel = {
     } catch (error) {
       console.error('Erreur addOrderItem:', error);
     }
+  },
+   async  getMessages(token) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(`${BASE_URL}/contact`, {
+        method: 'GET',
+        credentials: 'include',
+        headers,
+      });
+      if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Erreur getMessages:', error);
+      return null;
+    }
   }
 };
 

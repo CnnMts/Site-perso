@@ -32,8 +32,11 @@
 
 <script>
 import * as THREE from 'three';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import Swal  from 'sweetalert2';
+
 import orderModel from '@/models/orderModel';
 import orderItemModel from '@/models/orderItemModel';
 
@@ -137,24 +140,43 @@ export default {
 
       this.scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-      const loader = new GLTFLoader();
+      const manager = new THREE.LoadingManager();
+      manager.onStart = () => {
+      };
+      manager.onLoad = () => {
+      this.modelReady = true;
+      this.applyTexture();
+      };
+      manager.onProgress = (url, loaded, total) => {
+      };
+      manager.onError = (url) => {
+      console.error(`Erreur chargement : ${url}`);
+      };
+
+      const dracoLoader = new DRACOLoader(manager);
+      dracoLoader.setDecoderPath('/draco/');
+
+      const loader = new GLTFLoader(manager);
+      loader.setDRACOLoader(dracoLoader);
+
       loader.load(
-        '/Models/White-Mug.glb',
+        '/Models/Mug-White.glb',
         (gltf) => {
-          this.mug = gltf.scene;
-          this.mug.position.set(0, -0.03, 0);
-          this.mug.name = 'mug';
+        this.mug = gltf.scene;
+        this.mug.position.set(0, -0.03, 0);
+        this.mug.name = 'mug';
 
-          this.scene.add(this.mug);
-          this.modelReady = true;
+        this.scene.add(this.mug);
+        this.modelReady = true;
 
-          this.applyTexture();
-        },
-        undefined,
-        (err) => {
-          console.error("Erreur chargement GLB:", err);
-        }
-      );
+        this.applyTexture();
+      },
+      undefined,
+      (err) => {
+        console.error("Erreur chargement GLB:", err);
+      }
+    );
+
 
       const animate = () => {
         requestAnimationFrame(animate);
@@ -240,10 +262,20 @@ export default {
 
     const orderItemResponse = await orderItemModel.addOrderItem(orderItemData);
     console.log('Commande ajoutée :', { orderResponse, orderItemResponse });
-    alert('Commande effectuée');
+    await Swal.fire({
+      icon: 'success',
+      title: 'Commande effectuée',
+      text: 'Votre commande a bien été ajoutée au panier.',
+      confirmButtonText: 'OK'
+    });
     this.$router.push('/cart');
   } catch (error) {
-    alert("Connectez-vous pour faire votre panier");
+    await Swal.fire({
+      icon: 'error',
+      title: 'Connecté vous',
+      text: 'Il faut être connecté pour commander .',
+      confirmButtonText: 'OK'
+    });
     console.error("Erreur ajout panier :", error);
   }
 }
