@@ -229,8 +229,7 @@ const animate = () => {
           color: 0xffffff,
           metalness: 0,
           roughness: 1,
-        });
-      }
+        });      }
     });
     return;
   }
