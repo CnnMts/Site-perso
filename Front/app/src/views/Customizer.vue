@@ -102,7 +102,12 @@ export default {
         this.productType = "tumbler";
         this.canvasWidth = 730;
         this.canvasHeight = 272;
-      } else {
+      }
+      else if (productId == 3) {
+        this.productType = "Tshirt";
+        this.canvasWidth = 850;
+        this.canvasHeight = 275;
+      }else {
         console.warn("Produit inconnu, taille par défaut utilisée");
       }
 

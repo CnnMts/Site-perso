@@ -65,24 +65,27 @@ export default {
     };
   },
   watch: {
-    image(newVal) {
-      if (!this.mug || !this.modelReady) return;
+  image(newVal) {
+    if ((!this.mug && !this.tshirt) || !this.modelReady) return;
 
-      if (this.texture) {
-        this.texture.dispose();
-      }
-      this.texture = new THREE.Texture(this.$parent.canvas.lowerCanvasEl);
-      this.texture.needsUpdate = true;
-      this.texture.flipY = false;
-
-      this.mug.traverse(child => {
-        if (child.isMesh && child.name === 'Texture') {
-          child.material.map = this.texture;
-          child.material.needsUpdate = true;
-        }
-      });
+    if (this.texture) {
+      this.texture.dispose();
     }
-  },
+    this.texture = new THREE.Texture(this.$parent.canvas.lowerCanvasEl);
+    this.texture.needsUpdate = true;
+    this.texture.flipY = false;
+
+    const model = this.productId === '3' ? this.tshirt : this.mug;
+
+    model.traverse(child => {
+      if (child.isMesh && child.name === 'Texture') {
+        child.material.map = this.texture;
+        child.material.needsUpdate = true;
+      }
+    });
+  }
+},
+
   created() {
   const token = this.getCookie('pmaUser');
   if (token) {
@@ -97,11 +100,16 @@ export default {
   }
 },
   mounted() {
+  const url = window.location.pathname;
+  const parts = url.split('/');
+  this.productId = parts[2];
+
   this.mug = null;
   this.scene = null;
   this.camera = null;
   this.renderer = null;
   this.initThreeJS();
+  
 
 },
   methods: {
@@ -121,110 +129,131 @@ export default {
     },
 
     initThreeJS() {
-      const container = this.$refs.threeCanvas;
-      container.innerHTML = '';
+  const container = this.$refs.threeCanvas;
+  container.innerHTML = '';
 
-      this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0x000000);
+  this.scene = new THREE.Scene();
+  this.scene.background = new THREE.Color(0x000000);
 
-      this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-      this.camera.position.z = 0.3;
+  this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  this.camera.position.z = 0.3;
 
-      this.renderer = new THREE.WebGLRenderer({ antialias: true });
-      this.renderer.setSize(500, 500);
-      container.appendChild(this.renderer.domElement);
+  this.renderer = new THREE.WebGLRenderer({ antialias: true });
+  this.renderer.setSize(500, 500);
+  container.appendChild(this.renderer.domElement);
 
-      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-      this.controls.enableRotate = true;
-      this.controls.enablePan = true;
+  this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+  this.controls.enableRotate = true;
+  this.controls.enablePan = true;
 
-      this.scene.add(new THREE.AmbientLight(0xffffff, 1));
+  this.scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-      const manager = new THREE.LoadingManager();
-      manager.onStart = () => {
-      };
-      manager.onLoad = () => {
-      this.modelReady = true;
-      this.applyTexture();
-      };
-      manager.onProgress = (url, loaded, total) => {
-      };
-      manager.onError = (url) => {
-      console.error(`Erreur chargement : ${url}`);
-      };
+  const manager = new THREE.LoadingManager();
+  manager.onError = (url) => {
+    console.error(`Erreur chargement : ${url}`);
+  };
 
-      const dracoLoader = new DRACOLoader(manager);
-      dracoLoader.setDecoderPath('/draco/');
+  this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 
-      const loader = new GLTFLoader(manager);
-      loader.setDRACOLoader(dracoLoader);
+if (this.productId === '3') {
+  this.camera.position.set(0, 3, 5.5);
+  this.controls.target.set(0, 3, 5.5);
+} else {
+  this.camera.position.set(0, 0, 0.3);
+  this.controls.target.set(0, 0, 0);
+}
 
-      loader.load(
-        '/Models/Mug-White.glb',
-        (gltf) => {
+this.controls.update();
+
+
+  const dracoLoader = new DRACOLoader(manager);
+  dracoLoader.setDecoderPath('/draco/');
+
+  const loader = new GLTFLoader(manager);
+  loader.setDRACOLoader(dracoLoader);
+
+  let modelPath = '/Models/Mug-White.glb';
+  if (this.productId === '3') {
+    modelPath = '/Models/Tshirt_White.glb';
+  }
+
+  loader.load(
+    modelPath,
+    (gltf) => {
+      if (this.productId === '3') {
+        this.tshirt = gltf.scene;
+        this.tshirt.position.set(0, 0, 0);
+        this.tshirt.scale.set(1, 1, 1);
+        this.scene.add(this.tshirt);
+      } else {
         this.mug = gltf.scene;
         this.mug.position.set(0, -0.03, 0);
-        this.mug.name = 'mug';
-
+        this.mug.scale.set(1, 1, 1);
         this.scene.add(this.mug);
-        this.modelReady = true;
-
-        this.applyTexture();
-      },
-      undefined,
-      (err) => {
-        console.error("Erreur chargement GLB:", err);
       }
-    );
-
-
-      const animate = () => {
-        requestAnimationFrame(animate);
-        if (this.rotate && this.mug) {
-          this.mug.rotation.y += 0.004;
-        }
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
-      };
-
-      animate();
+      this.modelReady = true;
+      this.applyTexture();
     },
+    undefined,
+    (err) => {
+      console.error("Erreur chargement GLB:", err);
+    }
+  );
+const animate = () => {
+  requestAnimationFrame(animate);
+  if (this.rotate) {
+    if (this.productId === '3' && this.tshirt) {
+      this.tshirt.rotation.y += 0.001; 
+    } else if (this.mug) {
+      this.mug.rotation.y += 0.001;
+    }
+  }
+  this.controls.update();
+  this.renderer.render(this.scene, this.camera);
+};
+
+
+  animate();
+    },
+
 
     applyTexture() {
-      if (!this.modelReady || !this.mug) return;
-      if (!this.image) {
-        this.mug.traverse((child) => {
-          if (child.isMesh) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xffffff,
-              metalness: 0,
-              roughness: 1,
-            });
-          }
-        });
-        return;
-      }
-      const texture = new THREE.TextureLoader().load(this.image);
-      texture.flipY = false;
+  if (!this.modelReady) return;
+  const model = this.productId === '3' ? this.tshirt : this.mug;
+  if (!model) return;
 
-      this.mug.traverse((child) => {
-        if (child.isMesh) {
-          if (child.name === 'Texture') {
-            child.material = new THREE.MeshStandardMaterial({
-              map: texture,
-              metalness: 0,
-              roughness: 1,
-            });
-          } else {
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xffffff,
-              metalness: 0,
-              roughness: 1,
-            });
-          }
-        }
-      });
-    },
+  if (!this.image) {
+    model.traverse(child => {
+      if (child.isMesh) {
+        child.material = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          metalness: 0,
+          roughness: 1,
+        });
+      }
+    });
+    return;
+  }
+
+  const texture = new THREE.TextureLoader().load(this.image);
+  model.traverse(child => {
+    if (child.isMesh) {
+      if (child.name === 'Texture') {
+        child.material = new THREE.MeshStandardMaterial({
+          map: texture,
+          metalness: 0,
+          roughness: 1,
+        });
+      } else {
+        child.material = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          metalness: 0,
+          roughness: 1,
+        });
+      }
+    }
+  });
+},
 
    async addToCart() {
   if (!this.image) {
