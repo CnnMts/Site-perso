@@ -157,7 +157,6 @@ export default {
       orderItemModel.setToken(this.token);
       try {
         const data = await orderItemModel.getOrderByOrderId(order.id, this.token);
-        console.log("Données reçues de l'API :", data);
 
         if (!Array.isArray(data)) {
           console.error("La réponse n'est pas un tableau :", data);

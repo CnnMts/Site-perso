@@ -26,18 +26,17 @@
 </template>
 
 <script>
+import userModel from '@/models/userModel';
+
 export default {
   methods: {
     async logout() {
       try {
-        await fetch("http://127.0.0.1:9999/auth/logout", {
-          method: "POST",
-          credentials: "include"
-        });
-        alert("Vous êtes déconnecté");
-        window.location.href = "/login";
+        const response = await userModel.logOut();
+        if (!response.ok) {
+          throw new Error(`Erreur serveur: ${response.status}`);
+        }
       } catch (error) {
-        console.error("Erreur de déconnexion :", error);
       }
     }
   }

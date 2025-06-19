@@ -136,6 +136,23 @@ export default {
       console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
       return null;
     }
+  },
+
+  async logOut(){
+    try {
+      const response = await fetch(`${BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include"
+     });
+      if (!response.ok) {
+        throw new Error(`Erreur serveur: ${response.status}`);
+      }
+      alert("Vous êtes déconnecté");
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Erreur de déconnexion :", error);
+      alert("Erreur lors de la déconnexion, veuillez réessayer.");
+    }
   }
 
   };

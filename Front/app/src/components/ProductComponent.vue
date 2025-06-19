@@ -130,6 +130,8 @@
 
 
 <script>
+import productModel from '@/models/productModel'
+
 export default {
   data() {
     return {
@@ -146,59 +148,39 @@ export default {
   },
 
   methods: {
-    async fetchProducts() {
-      try {
-        const res = await fetch('http://127.0.0.1:9999/product')
-        this.products = await res.json()
-      } catch (err) {
-        this.logError('chargement des produits', err)
-      }
-    },
-
-    async addProduct() {
-      const payload = this.buildPostPayload()
-
-      try {
-        await fetch('http://127.0.0.1:9999/product', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        await this.afterFormSubmit()
-      } catch (err) {
-        this.logError('ajout du produit', err)
-      }
-    },
-
+   async fetchProducts() {
+    try {
+      this.products = await productModel.getProduct()
+    } catch (err) {
+      this.logError('chargement des produits', err)
+    }
+  },
+  async addProduct() {
+    const payload = this.buildPostPayload()
+    try {
+      await productModel.addProduct(payload) 
+      await this.afterFormSubmit()
+    } catch (err) {
+      this.logError('ajout du produit', err)
+    }
+  },
     async updateProduct() {
-     const payloadUpdate = this.buildPatchPayload()
-      const url =
-        `http://127.0.0.1:9999/product/${this.form.id}`
-
+      const payloadUpdate = this.buildPatchPayload()
       try {
-        await fetch(url, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payloadUpdate)
-        })
+        await productModel.updateProduct(this.form.id, payloadUpdate)
         await this.afterFormSubmit()
       } catch (err) {
         this.logError('mise à jour du produit', err)
       }
     },
-
     async deleteProduct(id) {
       try {
-        await fetch(
-          `http://127.0.0.1:9999/product/${id}`,
-          { method: 'DELETE' }
-        )
+        await productModel.deleteProduct(id)
         await this.fetchProducts()
       } catch (err) {
         this.logError('suppression du produit', err)
       }
     },
-
     handleSubmit() {
       if (this.form.id) {
         this.updateProduct()

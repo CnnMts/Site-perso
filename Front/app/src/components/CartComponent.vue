@@ -98,10 +98,7 @@ export default {
   computed: {
     groupedItems() {
       if (!this.cart || !this.cart.items) return [];
-
       const map = new Map();
-      console.log(this.cart.items)
-
       this.cart.items.forEach((item) => {
         const key = item.product_name;
         if (map.has(key)) {

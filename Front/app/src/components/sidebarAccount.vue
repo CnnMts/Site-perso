@@ -261,7 +261,6 @@ export default {
       zip_code: this.user.zip_code,
       city: this.user.city
     };
-    console.log(payload)
 
     try {
       const response = await userModel.updateUserDelivery(this.userId, payload);
