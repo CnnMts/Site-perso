@@ -1,81 +1,88 @@
+
 # Mug & Co Customizer
 
-Une application web Vue.js permettant aux utilisateurs de personnaliser des mugs et t-shirts via un canevas interactif avec Fabric.js et d’afficher un rendu 3D en temps réel avec Three.js.
+Une application web développée avec Vue.js permettant aux utilisateurs de personnaliser des mugs et t-shirts via un canevas interactif (Fabric.js) et un rendu 3D en temps réel (Three.js).
 
-## Fonctionnalités principales
+## Fonctionnalités
 
-*   Interface intuitive pour personnaliser visuellement des produits (mugs, t-shirts)
-*   Intégration de Fabric.js pour la gestion du canevas
-*   Rendu 3D dynamique avec Three.js
-*   Import d’images personnelles
-*   Zones de sécurité et marges affichées sur le canevas
-*   Système de panier et de commandes (back-end en PHP avec API REST)
+- Interface intuitive pour personnaliser visuellement des produits (mugs, t-shirts)
+- Intégration de **Fabric.js** pour la gestion du canevas
+- Rendu 3D dynamique avec **Three.js**
+- Importation d’images personnelles
+- Affichage des zones de sécurité et des marges sur le canevas
+- Système de panier et de commande via une **API REST** PHP
 
 ## Tech Stack
 
-*   **Frontend**: Vue.js, TailwindCSS, Fabric.js, Three.js
-*   **Backend**: PHP MVC custom avec routes et middlewares
-*   **Base de données**: MySQL
+- **Frontend** : Vue.js, TailwindCSS, Fabric.js, Three.js, Vite
+- **Backend** : PHP (architecture MVC custom avec routing et middlewares)
+- **Base de données** : MySQL
 
 ## Installation
 
 Suivez ces étapes pour configurer et lancer le projet localement :
 
-1.  **Cloner le dépôt :**
-    ```bash
-    git clone https://github.com/CnnMts/site-perso.git
-    cd site-perso
-    ```
+### 1. Cloner le dépôt
 
-2.  **Installer les dépendances frontend :**
-    ```bash
-    # Naviguer vers le dossier du frontend (ajustez si nécessaire)
-    cd Front
-    # Installer les dépendances avec npm ou yarn
-    npm install
-    # ou
-    yarn install
-    ```
+```bash
+git clone https://github.com/CnnMts/site-perso.git
+cd site-perso
+```
 
-3.  **Installer les dépendances backend :**
-    ```bash
-    # Naviguer vers le dossier du backend (ajustez si nécessaire)
-    cd ../Back
-    # Installer les dépendances avec Composer
-    composer install
-    ```
+### 2. Installer les dépendances
 
-4.  **Configuration de l'environnement :**
-    *   Créez un fichier `.env` à partir de `.env.example` dans le dossier backend et configurez vos identifiants de base de données MySQL.
-    *   Importez la structure de la base de données (par exemple, à partir d'un fichier `database.sql` si fourni).
+#### Frontend (Vue.js)
 
-5.  **Lancer l'application :**
-    *   **Frontend (Vue.js) :**
-        ```bash
-        # Depuis le dossier Front/app/src
-        npm run dev
-        # ou
-        yarn serve
-        ```
-    *   **Backend (PHP) :** Configurez votre serveur web local (Apache, Nginx) pour pointer vers le dossier `public` du backend. Assurez-vous que les réécritures d'URL sont activées pour que le routage PHP fonctionne correctement. Alternativement, vous pouvez utiliser le serveur de développement intégré de PHP (moins recommandé pour un développement complet) :
-        ```bash
-        # Depuis le dossier backend/public
-        php -S localhost:9999
-        ```
-    L'application frontend devrait être accessible sur `http://localhost:5173` (ou un port similaire) et l'API backend sur `http://localhost:9999` (ou le port que vous avez configuré).
+```bash
+cd Front
+npm install
+# ou
+yarn install
+```
 
-## Auteur
+#### Backend (PHP)
 
-*   **Matis Conan**
+```bash
+cd ../Back
+composer install
+```
 
-## Contribuer
+### 3. Configurer l’environnement
 
-Les contributions sont les bienvenues ! Si vous souhaitez contribuer à ce projet, veuillez suivre ces étapes :
+- Créez un fichier `.env` à partir de `.env.example` dans le dossier `Back/`
+- Renseignez vos identifiants de base de données MySQL
+- Importez la base de données via un fichier `database.sql` si fourni
 
-1.  Forkez le projet.
-2.  Créez une nouvelle branche pour votre fonctionnalité (`git checkout -b feature/nouvelle-fonctionnalite`).
-3.  Commitez vos changements (`git commit -m 'Ajout de nouvelle-fonctionnalite'`).
-4.  Pushez vers la branche (`git push origin feature/nouvelle-fonctionnalite`).
-5.  Ouvrez une Pull Request.
+### 4. Lancer l'application
 
-Veuillez vous assurer que votre code respecte les conventions de style du projet et inclut des tests pertinents si applicable.
+#### Frontend (Vite - Vue.js)
+
+```bash
+cd Front/app/src
+npm run dev
+# ou
+yarn dev
+```
+
+Accès : [http://localhost:5173](http://localhost:5173)
+
+#### Backend (PHP)
+
+Utilisez un serveur web local (Apache/Nginx) pointant vers `Back/public`, ou bien le serveur de développement intégré :
+
+```bash
+cd Back/public
+php -S localhost:9999
+```
+
+Accès API : [http://localhost:9999](http://localhost:9999)
+ Assurez-vous que la réécriture d’URL (URL rewriting) est activée si vous utilisez Apache pour faire fonctionner le routing proprement.
+
+
+1. Forkez le projet
+2. Créez une branche (`git checkout -b feature/ma-fonction`)
+3. Commitez vos changements (`git commit -m "Ajout de ma fonction"`)
+4. Pushez la branche (`git push origin feature/ma-fonction`)
+5. Ouvrez une **Pull Request**
+
+Merci de respecter les conventions du projet et d’inclure des tests pertinents si besoin.
