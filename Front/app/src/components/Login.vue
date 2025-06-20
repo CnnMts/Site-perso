@@ -62,7 +62,7 @@ export default {
         email: this.email,
         password: this.password,
       };
-
+      // Connect the user to his account registered in API
       const user = await userModel.logUser(userData);
 
       if (user) {

@@ -142,7 +142,7 @@ export default {
         this.errorMessage = "Les mots de passe ne correspondent pas.";
         return;
       }
-
+      // Prepares user data to be sent to register a new account
       const userData = {
         firstname: this.firstname,
         name: this.name,

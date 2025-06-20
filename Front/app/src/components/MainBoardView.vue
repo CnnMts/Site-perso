@@ -114,7 +114,8 @@ export default {
 
     try {
       const response = await orderModel.getOrders();
-
+      /* Adds the user's first and last name to each command,
+         or "Unknown" if the user is not found */
       const ordersWithUsernames = await Promise.all(
         response.map(async (order) => {
           try {
