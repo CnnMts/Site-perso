@@ -1,7 +1,6 @@
 <template>
-  <div class="w-60 h-screen flex flex-col p-5 shadow-md
-              bg-gradient-to-b from-purple-700 to-pink-500 text-white">
-    <div class="text-2xl font-bold mb-10 text-center drop-shadow-md">
+  <div class="fixed top-0 left-0 w-72 h-full bg-gray-900 shadow-xl px-6 py-8 border-r border-pink-500/20 text-white">
+    <div class="text-2xl  mb-10 text-center drop-shadow-md font-extrabold tracking-wide text-pink-500 drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">
       Admin
     </div>
     <nav class="flex flex-col gap-4">

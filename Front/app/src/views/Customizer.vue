@@ -1,33 +1,36 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 p-4 sm:p-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full mx-0">
-      <div class="bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 p-4 sm:p-6 rounded-xl shadow-xl flex flex-col items-start w-full">
-        <h2 class="text-xl sm:text-2xl font-bold text-purple-600 mb-4">Personnalisation</h2>
-       <div ref="canvasContainer" class="w-full mb-4" :class="aspectRatioClass"  >
-        <canvas
+  <NavBar />
+  <div class="min-h-screen text-white p-6 mt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8  mx-auto animate-fade-in-up mt-12">
+      <div
+        class="p-6 rounded-3xl shadow-[0_0_30px_rgba(236,72,153,0.15)] border border-pink-500/20 flex flex-col items-start"
+      >
+        <div ref="canvasContainer" class="w-full mb-4" :class="aspectRatioClass">
+          <canvas
           ref="canvasRef"
           :width="canvasWidth"
           :height="canvasHeight"
           class="border rounded shadow-md w-full h-full">
         </canvas>
-      </div>
+        </div>
 
-        <label class="mt-4 sm:mt-6 cursor-pointer inline-block bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow hover:from-pink-600 hover:to-purple-600 transition">
+        <label
+          class="mt-4 sm:mt-6 cursor-pointer inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-full shadow hover:from-pink-600 hover:to-purple-700 transition"
+        >
           Importer une image
-          <input
-            type="file"
-            @change="onFileChange"
-            class="hidden"
-          />
+          <input type="file" @change="onFileChange" class="hidden" />
         </label>
       </div>
-      <div class="flex items-center justify-center bg-gray-100 p-4 sm:p-6 rounded-xl shadow-xl w-full">
+      <div
+        class="flex items-center justify-center p-6 rounded-3xl shadow-[0_0_20px_rgba(236,72,153,0.1)] border border-pink-500/10"
+      >
         <DViewModal :image="previewImage" :product="productType" />
       </div>
     </div>
   </div>
-  <Footer />
 </template>
+
+
 
 
 
@@ -36,13 +39,13 @@
 import * as fabric from "fabric";
 import _ from "lodash";
 import DViewModal from "@/components/3dViewModal.vue";
-import Footer from "@/components/Footer.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default {
   name: "Customizer",
   components: {
     DViewModal,
-    Footer,
+    NavBar
   },
   data() {
     return {

@@ -1,6 +1,5 @@
 <template>
 <CartComponent />
-
 </template>
 
 <script>

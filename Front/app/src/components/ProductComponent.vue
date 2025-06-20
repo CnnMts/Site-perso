@@ -101,7 +101,7 @@
       <li
         v-for="product in products"
         :key="product.id"
-        class="border border-violet-300 p-3 rounded flex justify-between items-center bg-white shadow-sm hover:shadow-md transition-shadow"
+        class="border border-violet-300 p-3 rounded flex justify-between items-center shadow-sm hover:shadow-md transition-shadow max-w-2xl"
       >
         <div class="text-purple-700">
           <strong>{{ product.name }}</strong><br />

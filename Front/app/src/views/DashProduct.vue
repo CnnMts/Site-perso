@@ -3,7 +3,7 @@
     <div >
       <SideBar />
     </div>
-    <div class="flex-1  p-4 overflow-y-auto">
+    <div class="flex-1  p-4 overflow-y-auto ml-[650px]">
       <product />
     </div>
   </div>

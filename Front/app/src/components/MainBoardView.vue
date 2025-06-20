@@ -1,6 +1,6 @@
 <template>
-  <div class="flex-1 p-8 bg-gradient-to-b from-purple-50 via-pink-50 to-white overflow-y-auto">
-  <h1 class="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 bg-clip-text text-transparent">
+  <div class="flex-1 p-8 max-w-8xl overflow-y-auto ml-[350px]">
+  <h1 class="text-xl font-bold mb-8 bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 bg-clip-text text-transparent">
   Tableau de bord
   </h1>
 

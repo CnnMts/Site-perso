@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-pink-50 py-6 px-4 sm:py-12 sm:px-6 lg:px-8">
-    <div v-if="product" class="max-w-md sm:max-w-xl lg:max-w-3xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
-      <div class="p-4 sm:p-6 flex flex-col items-center text-center">
+  <div class="min-h-screen  py-6 px-4 sm:py-12 sm:px-6 lg:px-8">
+    <div v-if="product" class="max-w-md sm:max-w-xl lg:max-w-3xl mx-auto shadow-lg rounded-xl overflow-hidden">
+      <div class="p-4 sm:p-6 flex flex-col items-center text-center bg-gray-900 bg-opacity-10 ">
         <h1 class="text-2xl sm:text-3xl font-bold text-indigo-600 mb-3 sm:mb-4">Détails du produit</h1>
         <img
           :src="product.picture_url || '/Assets/Accessoire/default.jpg'"
           alt="Image du produit"
-          class="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-lg shadow-md mb-4 sm:mb-6"
+          class="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-lg  mb-4 sm:mb-6"
         />
-        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">{{ product.name }}</h3>
+        <h3 class="text-xl sm:text-2xl font-semibold text-pink-700 mb-2">{{ product.name }}</h3>
         <p class="text-lg text-pink-600 font-medium mb-3 sm:mb-4">Prix : {{ product.sale_price }} €</p>
-        <p class="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6">Description : {{ product.description || 'Aucune description disponible.' }}</p>
+        <p class="text-sm sm:text-base text-violet-900 mb-4 sm:mb-6">Description : {{ product.description || 'Aucune description disponible.' }}</p>
 
         <button
           @click="goToCustomizer"

@@ -1,3 +1,108 @@
+<template>
+  <nav class="bg-gray-900 bg-opacity-70 shadow-md fixed top-0 left-0 w-full z-50 ">
+    <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col items-center">
+      <div class="w-full flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <a href="/">
+            <img src="../assets/navIcon/Logo.png" alt="Logo" class="h-20 object-contain drop-shadow-md" />
+          </a>
+          <button class="md:hidden text-white text-3xl" @click="toggleMobileMenu">
+            ☰
+          </button>
+        </div>
+
+      <div class="hidden md:flex flex-grow justify-center px-4 items-center ml-20">
+          <div class="flex w-[400px] bg-gray-800 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.7)] overflow-hidden focus-within:ring-4 focus-within:ring-pink-500 transition"
+          >
+          <input
+             type="text"
+              v-model="searchQuery"
+              placeholder="Rechercher un produit..."
+              class="flex-grow px-4 py-2 bg-gray-800 text-white placeholder-white focus:outline-none rounded-l-full caret-pink-400"
+              @keydown.enter="handleSearch"
+          />
+          <button
+            @click="handleSearch"
+            class="bg-pink-600 hover:bg-pink-700 text-white px-5 rounded-r-full transition-colors flex items-center justify-center shadow-[0_0_10px_rgba(236,72,153,0.8)]"
+          >
+            <img src="../assets/loupe.svg" alt="Rechercher" class="h-5 w-5 invert" />
+          </button>
+          </div>
+          <div class="text-sm mt-1 min-h-[1.25rem] ml-4 text-white">
+            {{ searchError }}
+          </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-6 text-white text-lg">
+          <a href="/contact" title="Support" class="flex items-center justify-center">
+            <img src="../assets/navIcon/support.png" alt="Support" class="h-7 w-7 invert" />
+          </a>
+          <a href="/cart" title="Panier" class="flex items-center justify-center">
+            <img src="../assets/navIcon/shopping-cart.png" alt="Panier" class="h-7 w-7 invert" />
+          </a>
+          <template v-if="!state.isLoggedIn">
+            <a
+              href="/login"
+              class="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-700 transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              S'identifier
+            </a>
+          </template>
+          <template v-else>
+            <a href="/account" title="Mon compte" class="flex items-center justify-center">
+              <img src="../assets/navIcon/compte.png" alt="Compte" class="h-7 w-7 invert " />
+            </a>
+          </template>
+        </div>
+      </div>
+
+      <div v-if="isMobileMenuOpen" class="md:hidden bg-white text-gray-800 px-4 py-4 space-y-4">
+        <div class="flex justify-around items-center text-lg">
+          <a href="/contact">
+            <img src="../assets/navIcon/support.png" alt="Support" class="h-6 w-6" />
+          </a>
+          <template v-if="!state.isLoggedIn">
+            <a href="/login">
+              <img src="../assets/navIcon/compte.png" alt="Connexion" class="h-6 w-6" />
+            </a>
+          </template>
+          <template v-else>
+            <a href="/account">
+              <img src="../assets/navIcon/compte.png" alt="Compte" class="h-6 w-6" />
+            </a>
+          </template>
+          <a href="/cart">
+            <img src="../assets/navIcon/shopping-cart.png" alt="Panier" class="h-6 w-6" />
+          </a>
+        </div>
+        <div>
+          <div class="flex bg-white rounded-full shadow-md overflow-hidden focus-within:ring-2 focus-within:ring-pink-400">
+            <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="Rechercher un produit..."
+              class="flex-grow px-4 py-2 text-gray-700 focus:outline-none rounded-l-full"
+              @keydown.enter="handleSearch"
+            />
+            <button
+              @click="handleSearch"
+              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors flex items-center justify-center"
+            >
+              🔍
+            </button>
+          </div>
+          <div class="text-red-500 text-sm mt-1 min-h-[1.25rem]">
+            {{ searchError }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</template>
+
 <script setup>
 import { reactive, ref, onMounted, defineEmits, watch } from 'vue';
 
@@ -70,108 +175,4 @@ onMounted(() => {
   }
 });
 </script>
-
-<template>
-  <nav class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md">
-    <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col items-center">
-      <div class="w-full flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <a href="/">
-            <img src="../assets/navIcon/Logo.webp" alt="Logo" class="h-12 object-contain drop-shadow-md" />
-          </a>
-          <button class="md:hidden text-white text-3xl" @click="toggleMobileMenu">
-            ☰
-          </button>
-        </div>
-
-      <div class="hidden md:flex flex-grow justify-center px-4 items-center ml-20">
-          <div class="flex w-[400px] bg-white rounded-full shadow-md overflow-hidden focus-within:ring-2 focus-within:ring-pink-400">
-            <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Rechercher un produit..."
-              class="flex-grow px-4 py-2 text-gray-700 focus:outline-none rounded-l-full"
-              @keydown.enter="handleSearch"
-            />
-            <button
-              @click="handleSearch"
-              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors flex items-center justify-center"
-            >
-              <img src="../assets/loupe.svg" alt="Rechercher" class="h-5 w-5" />
-            </button>
-          </div>
-          <div class="text-sm mt-1 min-h-[1.25rem] ml-4 text-white">
-            {{ searchError }}
-          </div>
-        </div>
-
-        <div class="hidden md:flex items-center gap-6 text-white text-lg">
-          <a href="/contact" title="Support" class="flex items-center justify-center">
-            <img src="../assets/navIcon/support.png" alt="Support" class="h-7 w-7" />
-          </a>
-          <a href="/cart" title="Panier" class="flex items-center justify-center">
-            <img src="../assets/navIcon/shopping-cart.png" alt="Panier" class="h-7 w-7" />
-          </a>
-          <template v-if="!state.isLoggedIn">
-            <a
-              href="/login"
-              class="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-700 transition"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-              S'identifier
-            </a>
-          </template>
-          <template v-else>
-            <a href="/account" title="Mon compte" class="flex items-center justify-center">
-              <img src="../assets/navIcon/compte.png" alt="Compte" class="h-7 w-7" />
-            </a>
-          </template>
-        </div>
-      </div>
-
-      <div v-if="isMobileMenuOpen" class="md:hidden bg-white text-gray-800 px-4 py-4 space-y-4">
-        <div class="flex justify-around items-center text-lg">
-          <a href="/contact">
-            <img src="../assets/navIcon/support.png" alt="Support" class="h-6 w-6" />
-          </a>
-          <template v-if="!state.isLoggedIn">
-            <a href="/login">
-              <img src="../assets/navIcon/compte.png" alt="Connexion" class="h-6 w-6" />
-            </a>
-          </template>
-          <template v-else>
-            <a href="/account">
-              <img src="../assets/navIcon/compte.png" alt="Compte" class="h-6 w-6" />
-            </a>
-          </template>
-          <a href="/cart">
-            <img src="../assets/navIcon/shopping-cart.png" alt="Panier" class="h-6 w-6" />
-          </a>
-        </div>
-        <div>
-          <div class="flex bg-white rounded-full shadow-md overflow-hidden focus-within:ring-2 focus-within:ring-pink-400">
-            <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Rechercher un produit..."
-              class="flex-grow px-4 py-2 text-gray-700 focus:outline-none rounded-l-full"
-              @keydown.enter="handleSearch"
-            />
-            <button
-              @click="handleSearch"
-              class="bg-pink-500 hover:bg-pink-600 text-white px-4 rounded-r-full transition-colors flex items-center justify-center"
-            >
-              🔍
-            </button>
-          </div>
-          <div class="text-red-500 text-sm mt-1 min-h-[1.25rem]">
-            {{ searchError }}
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
-</template>
 

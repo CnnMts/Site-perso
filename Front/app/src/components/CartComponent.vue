@@ -1,7 +1,7 @@
 <template>
-  <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+  <div class="max-w-7xl mx-auto p-6  rounded-lg shadow-md">
     <h1
-      class="text-3xl font-extrabold mb-6 border-b-4 border-violet-400 pb-2 text-gray-900 text-center"
+      class="text-3xl font-extrabold tracking-wide text-pink-500 drop-shadow-[0_0_10px_rgba(236,72,153,0.5)] flex items-center justify-center"
     >
       Mon Panier
     </h1>
@@ -14,7 +14,7 @@
       Aucun panier actif trouvé.
     </div>
 
-    <div v-else-if="cart.status_id === 3" class="font-semibold text-lg text-center">
+    <div v-else-if="cart.status_id === 3" class="font-semibold text-lg text-center text-pink-600 animate-bounce">
       Vous n'avez plus de commande en cours
     </div>
 
@@ -29,7 +29,7 @@
             <div class="w-full sm:w-3/4">
               <p
                 @click="toggleDetail(group.name)"
-              class="font-semibold text-lg text-gray-800 hover:text-transparent hover:bg-clip-text 
+              class="font-semibold text-lg text-pink-500 hover:text-transparent hover:bg-clip-text 
                       hover:bg-gradient-to-r hover:from-pink-500 hover:to-violet-600 
                       active:from-pink-600 active:to-violet-700 
                       break-words cursor-pointer select-none transition-all duration-300"
@@ -68,7 +68,7 @@
       <div
         class="mt-8 border-t border-gray-300 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4"
       >
-        <p class="text-2xl font-extrabold text-gray-900">
+        <p class="text-2xl font-extrabold text-violet-600">
           Total : {{ (Number(cart.total_price) || 0).toFixed(2) }} €
         </p>
         <button

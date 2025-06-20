@@ -4,11 +4,21 @@
     <div 
       v-for="user in users" 
       :key="user.id" 
-      class="p-4 mb-4 rounded-lg border border-violet-300 bg-gradient-to-br from-purple-50 to-pink-50 shadow"
+      class="p-4 mb-4 rounded-lg border border-violet-300 shadow"
     >
-      <p><strong class="text-violet-800">Nom :</strong> {{ user.name }}</p>
-      <p><strong class="text-violet-800">Email :</strong> {{ user.email }}</p>
-      <p><strong class="text-violet-800">Rôle :</strong> {{ user.role }}</p>
+    <p>
+      <strong class="text-violet-800">Nom : </strong> 
+      <span class="text-pink-600">{{ user.name }}</span>
+    </p>
+
+      <p>
+      <strong class="text-violet-800">Email : </strong> 
+      <span class="text-pink-600">{{ user.email }}</span>
+    </p>
+      <p>
+      <strong class="text-violet-800">Role : </strong> 
+      <span class="text-pink-600">{{ user.role }}</span>
+    </p>
 
       <button
         @click="deleteUser(user.id)"

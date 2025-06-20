@@ -16,25 +16,27 @@ import Cart from '../views/Cart.vue';
 import Account from '../views/AccountView.vue';
 import Error404 from '../views/Error404.vue';
 import DashContactForm from '../views/DashForm.vue'
+import LandingPage from '../views/LandingPage.vue'
 
 const admin = 1;
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/user', name: 'UserView', component: UserView, meta: { requiresAdmin: true } },
-  { path: '/register', name: 'Register', component: RegisterView },
-  { path: '/login', name: 'Login', component: LoginView },
+  { path: '/register', name: 'Register', component: RegisterView, meta: { hideFooter: true } },
+  { path: '/login', name: 'Login', component: LoginView , meta: { hideFooter: true }},
   { path: '/product/:id', name: 'product-detail', component: ProductDetail },
   { path: '/customizer/:id', name: 'Customizer', component: Customizer },
   { path: '/render', name: 'render', component: Render3d },
   { path: '/contact', name: 'contact', component: Contact },
-  { path: '/cart', name: 'cart', component: Cart },
-  { path: '/account', name: 'account', component: Account },
-  { path: '/dash', name: 'dash', component: Dash, meta: { requiresAdmin: true } },
-  { path: '/dash/users', name: 'dashUsers', component: DashBoardUsers, meta: { requiresAdmin: true } },
-  { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true } },
-  { path: '/dash/form', name: 'dashContact', component: DashContactForm, meta: { requiresAdmin: true } },
-  { path: '/:pathMatch(.*)*', name: 'Error404', component: Error404 }
+  { path: '/landing', name: 'LandingPage', component: LandingPage },
+  { path: '/cart', name: 'cart', component: Cart , meta: { hideFooter: true }},
+  { path: '/account', name: 'account', component: Account,  meta: { hideFooter: true } },
+  { path: '/dash', name: 'dash', component: Dash, meta: { requiresAdmin: true, hideFooter: true } },
+  { path: '/dash/users', name: 'dashUsers', component: DashBoardUsers, meta: { requiresAdmin: true , hideFooter: true} },
+  { path: '/dash/product', name: 'dashProduct', component: DashBoardProduct, meta: { requiresAdmin: true, hideFooter: true } },
+  { path: '/dash/form', name: 'dashContact', component: DashContactForm, meta: { requiresAdmin: true ,hideFooter: true} },
+  { path: '/:pathMatch(.*)*', name: 'Error404', component: Error404,  meta: { hideFooter: true } }
 ];
 
 const router = createRouter({

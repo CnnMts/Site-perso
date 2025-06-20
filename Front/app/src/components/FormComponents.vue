@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6">
+  <div class="p-6 ml-[550px] max-w-4xl" >
     <h1 class="text-2xl font-bold mb-4 text-purple-700">Messages du formulaire de contact</h1>
 
     <button
@@ -13,12 +13,24 @@
       <li
         v-for="message in messages"
         :key="message.id"
-        class="border border-violet-300 p-4 rounded bg-white shadow-sm hover:shadow-md transition-shadow"
+        class="border border-violet-300 p-4 rounded shadow-sm hover:shadow-md transition-shadow"
       >
-        <p><strong>Nom :</strong> {{ message.name }}</p>
-        <p><strong>Email :</strong> {{ message.email }}</p>
-        <p><strong>Sujet :</strong> {{ message.subject }}</p>
-        <p><strong>Message :</strong> {{ message.message }}</p>
+        <p>
+      <strong class="text-violet-800">Nom : </strong> 
+      <span class="text-pink-600">{{ message.name }}</span>
+    </p>
+        <p>
+      <strong class="text-violet-800">Email : </strong> 
+      <span class="text-pink-600">{{ message.name }}</span>
+    </p>
+       <p>
+      <strong class="text-violet-800">Sujet : </strong> 
+      <span class="text-pink-600">{{ message.subject }}</span>
+    </p>
+        <p>
+      <strong class="text-violet-800">Message : </strong> 
+      <span class="text-pink-600">{{ message.message }}</span>
+    </p>
         <p class="text-sm text-gray-500 mt-2">Envoyé le : {{ formatDate(message.created_at) }}</p>
       </li>
     </ul>
