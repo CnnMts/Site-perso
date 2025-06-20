@@ -2,10 +2,6 @@
 
 Une application web Vue.js permettant aux utilisateurs de personnaliser des mugs et t-shirts via un canevas interactif avec Fabric.js et d’afficher un rendu 3D en temps réel avec Three.js.
 
-## Aperçu
-
-![Aperçu de Mug & Co Customizer](assets/preview.png)
-
 ## Fonctionnalités principales
 
 *   Interface intuitive pour personnaliser visuellement des produits (mugs, t-shirts)
@@ -27,14 +23,14 @@ Suivez ces étapes pour configurer et lancer le projet localement :
 
 1.  **Cloner le dépôt :**
     ```bash
-    git clone https://github.com/votre-utilisateur/mug-co-customizer.git
-    cd mug-co-customizer
+    git clone https://github.com/CnnMts/site-perso.git
+    cd site-perso
     ```
 
 2.  **Installer les dépendances frontend :**
     ```bash
     # Naviguer vers le dossier du frontend (ajustez si nécessaire)
-    cd frontend
+    cd Front
     # Installer les dépendances avec npm ou yarn
     npm install
     # ou
@@ -44,7 +40,7 @@ Suivez ces étapes pour configurer et lancer le projet localement :
 3.  **Installer les dépendances backend :**
     ```bash
     # Naviguer vers le dossier du backend (ajustez si nécessaire)
-    cd ../backend
+    cd ../Back
     # Installer les dépendances avec Composer
     composer install
     ```
@@ -56,17 +52,17 @@ Suivez ces étapes pour configurer et lancer le projet localement :
 5.  **Lancer l'application :**
     *   **Frontend (Vue.js) :**
         ```bash
-        # Depuis le dossier frontend
-        npm run serve
+        # Depuis le dossier Front/app/src
+        npm run dev
         # ou
         yarn serve
         ```
     *   **Backend (PHP) :** Configurez votre serveur web local (Apache, Nginx) pour pointer vers le dossier `public` du backend. Assurez-vous que les réécritures d'URL sont activées pour que le routage PHP fonctionne correctement. Alternativement, vous pouvez utiliser le serveur de développement intégré de PHP (moins recommandé pour un développement complet) :
         ```bash
         # Depuis le dossier backend/public
-        php -S localhost:8000
+        php -S localhost:9999
         ```
-    L'application frontend devrait être accessible sur `http://localhost:8080` (ou un port similaire) et l'API backend sur `http://localhost:8000` (ou le port que vous avez configuré).
+    L'application frontend devrait être accessible sur `http://localhost:5173` (ou un port similaire) et l'API backend sur `http://localhost:9999` (ou le port que vous avez configuré).
 
 ## Auteur
 
